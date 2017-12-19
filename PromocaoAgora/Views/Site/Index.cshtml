@@ -1,0 +1,225 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section Scripts{
+<script type="text/javascript">
+    getLocation();
+    function getLocation() {
+        //alert("incio");
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+            //alert("entrei");
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
+    function showPosition(position) {
+        //alert("oi");
+        var google_map_pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+        var google_maps_geocoder = new google.maps.Geocoder();
+        google_maps_geocoder.geocode(
+            { 'latLng': google_map_pos },
+            function (results, status) {
+                //alert(results);
+                $("#txt_local").val(results[0].formatted_address);
+                console.log(results);
+            }
+        );
+        //x.innerHTML = "Latitude: " + position.coords.latitude +
+        //    "<br>Longitude: " + position.coords.longitude;
+    }
+    
+</script>
+    }
+<div class="row mt-3">
+    <div class="col-md-6">
+        <input type="text" id="txt_busca" placeholder="Digite o que você quer buscar" style="width:70%" />
+        <button type="button" class="btn btnGD">Buscar</button>
+    </div>
+    <div class="col-md-6 hidden-sm-down">
+        @*<span>Seu local:</span><br/>*@
+        <img src="~/Content/img/local_icon.png" />
+        <input type="text" id="txt_local" placeholder="Localização Atual" class="f8r formSemBorda" style="width:95%;" /><br/>
+        <input type="hidden" id="hid_lat" />
+        <input type="hidden" id="hid_lng" />
+        <button type="button" class="btn btn-sm btn-info" onclick="getLocation()">Alterar seu local</button>
+        
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-9">
+        <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="pill" href="#home" role="tab">Ofertas Próximas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="pill" href="#profile" role="tab">Ofertas Web</a>
+            </li>
+            
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="home" role="tabpanel">
+
+                <!-- coment -->
+                <div class="row">
+                    <div class="col">
+                        <div class="reg mt-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                                </div>
+                                <div class="col-md-10">
+                                    <div>
+                                        <div class="f12r subtitulo"><a href="#">Parmegiana Factory: Parmegiana de Filé-Mignon, Frango ou Berinjela para 1 ou 2 Pessoas</a></div><br />
+                                        <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                        <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                                        <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                    </div>
+                                   
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="reg mt-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                                </div>
+                                <div class="col-md-10">
+                                    <div>
+                                        <div class="f12r subtitulo"><a href="#">Rodízio de massa por 30 reais apenas! - 30% Off</a></div><br />
+                                        <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                        <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                                        <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="reg mt-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                                </div>
+                                <div class="col-md-10">
+                                    <div>
+                                        <div class="f12r subtitulo"><a href="#">Parmegiana Factory: Parmegiana de Filé-Mignon, Frango ou Berinjela para 1 ou 2 Pessoas</a></div><br />
+                                        <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                        <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                                        <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="reg mt-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                                </div>
+                                <div class="col-md-10">
+                                    <div>
+                                        <div class="f12r subtitulo"><a href="#">Parmegiana Factory: Parmegiana de Filé-Mignon, Frango ou Berinjela para 1 ou 2 Pessoas</a></div><br />
+                                        <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                        <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                                        <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- coment -->
+
+                <div class="reg mt-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                        </div>
+                        <div class="col-10">
+                            <div>
+                                <span class="f12r subtitulo"><a href="#">Rodízio de massa por 30 reais apenas! - 30% Off</a></span><br />
+                                <span class="f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</span><br />
+                                <div class="f-verde f8r"><span class="font-weight-bold">0,5 Km</span> - Freguesia</div>
+                                <div class="text-right">Preço: <span class="f16r f-verde font-weight-bold">R$ 30,00</span></div>
+                                
+                            </div>
+                            
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg mt-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <img class="imgw40" src="~/Content/img/viagem_icon64.png" alt="Viagem">
+                        </div>
+                        <div class="col-10">
+                            <div>
+                                <span class="f12r subtitulo"><a href="/site/promocao">Thermas de Olímpia Resort/SP: até 7 noites para 2 adultos e Cortesia para até 3 Crianças de até 12 anos em até 12x. Alta Temporada 2018! - 30% Off</a></span><br />
+                                <span class="f-verde f9r">Restaurante Rio Das Ostras</span><br />
+                                <span class="f-verde f8r">0,5 Km - Freguesia</span>
+                                <div class="text-right">a partir de <span class=" f16r f-verde">R$ 499,99</span></div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reg mt-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                        </div>
+                        <div class="col-10">
+                            <div>
+                                <span class="f12r subtitulo"><a href="#">Rodízio Esteira ou Premium para até 2 pessoas</a></span><br />
+                                <span class="f-verde f9r">Restaurante Rio Das Ostras</span><br />
+                                <span class="f-verde f8r">0,5 Km - Freguesia</span>
+                                <div class="text-right">a partir de <span class=" f16r f-verde">R$ 499,99</span></div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tab-pane" id="profile" role="tabpanel">...</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 pt-5">
+        <h5>CATEGORIAS</h5>
+        <p><a href="#">ALIMENTAÇÃO</a></p>
+        <p><a href="#">CASA E ESCRITÓRIO</a></p>
+        <p><a href="#">EDUCAÇÃO</a></p>
+        <p><a href="#">ENTRETENIMENTO</a></p>
+        <p><a href="#">ESPORTE</a></p>
+        <p><a href="#">ROUPA E ACESSÓRIOS</a></p>
+        <p><a href="#">SAÚDE</a></p>
+        <p><a href="#">TECNOLOGIA</a></p>
+        <p><a href="#">TRANSPORTE</a></p>
+        <p><a href="#">VIAGEM</a></p>
+</div>
+</div>
