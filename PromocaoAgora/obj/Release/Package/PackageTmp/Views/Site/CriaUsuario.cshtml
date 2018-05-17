@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewBag.Title = "CriaUsuario";
+    Layout = null;
+}
+
+<script type="text/javascript">
+    var redirectTo = window.location.href;
+    var loginTo = "/site/login?redirecturl=" + redirectTo;
+    $("#dologin").attr("href", loginTo);
+    //alert(redirectTo);
+    $("#btn-cadastroUsuario").click(function () {
+        
+        var Usuario = {
+            UsuarioId: guid(),
+            Nome: $("#txt_UNome").val(),
+            Email: $("#txt_UEmail").val(),
+            Senha: $("#txt_USenha").val(),
+            Status: "LEAD",
+            TagAcao: "CADASTRO-LEAD"
+        }
+        $.post("/api/CriaUsuario", Usuario)
+            .done(function (data) {
+                //console.log(data);
+                if (data.responseStatus == "OK") {
+                    alert("Cadastro criado com sucesso.");
+                    //location = redirectTo;
+                    $("#formU").hide();
+                    $("#formR").show();
+                } else {
+                    alert(data.desc);
+                }
+            });
+    });
+</script>
+
+
+<div>
+    <div class="">
+        <div id="formU" class="">
+            <label>Nome:</label><br />
+            <input type="text" id="txt_UNome" class="w-100 mb-2" placeholder="Nome" value="" /><br />
+            <label>Email:</label><br />
+            <input type="email" id="txt_UEmail" class="w-100 mb-2" placeholder="Email" value="" /><br />
+            <label>Senha:</label><br />
+            <input type="password" id="txt_USenha" class="w-100 mb-2" placeholder="Senha para acesso" /><br />
+            <button id="btn-cadastroUsuario" class="btn btn-primary">Cadastrar</button><br/><br /> 
+            <span>Já é cadastrado? <a href="#" id="dologin">Faça o Login</a></span>
+        </div>
+        <div id="formR" style="display:none;">
+            <strong>Um email de confirmação foi enviado para a sua caixa de correio.</strong> Por favor, clique no link que está no corpo desse email para confirmar seu cadastro.
+        </div>
+    </div>
+</div>
+

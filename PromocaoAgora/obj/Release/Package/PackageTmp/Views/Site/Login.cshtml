@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+    if ((int)ViewData["pp"] == 1)
+    {
+        Layout = null;
+    }
+}
+
+@section scripts{
+<script type="text/javascript">
+    $(document).ready(function () {
+        //pega a url a ser redirecionada apos o login
+        var redir = getUrlParameter("redirecturl");
+        if (redir == "") { redir = "/"; }
+
+        if (getCookie("logged")) {
+            location = redir;
+        }
+
+        $("#btn-LOGIN").click(function () {
+            var login = { email: $("#txt_logEmail").val(), pass: $("#txt_logSenha").val() }
+            $.post("/api/login", login)
+                .done(function (data) {
+                    //alert(data.responseStatus);
+                    switch (data.responseStatus) {
+                        case "OK":
+                            location = redir;
+                            
+                            break;
+                        case "NOTCONFIRMED":
+                            alert("CADASTRO NÃO CONFIRMADO, Por favor confirme o seu cadastro antes de fazer o login, clicando no link de confirmação no email em que lhe enviamos.");
+                            //$("#erroLogin").show();
+                            //$("#erroLogin").text("CADASTRO NÃO CONFIRMADO, Por favor confirme o seu cadastro antes de fazer o login, clicando no link de confirmação no email em que lhe enviamos.");
+                            break;
+                        default:
+                            alert("Email ou senha digitados não são válidos.");
+                            //$("#erroLogin").show();
+                            //$("#erroLogin").text("Email ou senha digitados não são válidos.");
+                    }
+
+
+                });
+        });
+    });
+
+
+</script>
+}
+<div class="row">
+
+    <div class="col-centered mt-4 col-md-4">
+        <div class="card" id="sectionlogin">
+            <h4 class="card-header">
+                <i class="fa fa-key" aria-hidden="true"></i> Login
+            </h4>
+            <div class="card-body p-4" id="bodyUsuario">
+                <p>Informe o email e a senha abaixo:</p>
+                <input type="email" id="txt_logEmail" class="w-100 mb-2" placeholder="Email">
+                <input type="password" id="txt_logSenha" class="w-100 mb-2" placeholder="Senha">
+                <button id="btn-LOGIN" class="btn btn-primary w-100">LOGIN</button>
+
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+

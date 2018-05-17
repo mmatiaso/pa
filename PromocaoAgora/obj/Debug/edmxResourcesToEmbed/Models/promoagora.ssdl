@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="promocaoagoraModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Campanha">
+    <Key>
+      <PropertyRef Name="CampanhaId" />
+    </Key>
+    <Property Name="CampanhaId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Nome" Type="varchar" MaxLength="100" />
+    <Property Name="EmailEnvios" Type="int" />
+    <Property Name="EmailAberturas" Type="int" />
+    <Property Name="EmailClicks" Type="int" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Categoria">
+    <Key>
+      <PropertyRef Name="CategoriaId" />
+    </Key>
+    <Property Name="CategoriaId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Nome" Type="varchar" MaxLength="50" />
+    <Property Name="Pai" Type="int" />
+    <Property Name="Tags" Type="varchar" MaxLength="200" />
+    <Property Name="Ativo" Type="bit" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Empresa">
+    <Key>
+      <PropertyRef Name="EmpresaId" />
+    </Key>
+    <Property Name="EmpresaId" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Nome" Type="varchar(max)" />
+    <Property Name="Email" Type="varchar" MaxLength="100" />
+    <Property Name="Telefone" Type="varchar" MaxLength="15" />
+    <Property Name="Celular" Type="varchar" MaxLength="15" />
+    <Property Name="CNPJ" Type="varchar" MaxLength="20" />
+    <Property Name="Responsavel" Type="varchar" MaxLength="80" />
+    <Property Name="CPFResponsavel" Type="varchar" MaxLength="15" />
+    <Property Name="Site" Type="varchar" MaxLength="150" />
+    <Property Name="Logradouro" Type="varchar" MaxLength="100" />
+    <Property Name="Numero" Type="varchar" MaxLength="20" />
+    <Property Name="Complemento" Type="varchar" MaxLength="20" />
+    <Property Name="Bairro" Type="varchar(max)" />
+    <Property Name="Cidade" Type="varchar(max)" />
+    <Property Name="UF" Type="varchar" MaxLength="2" />
+    <Property Name="CEP" Type="varchar" MaxLength="10" />
+    <Property Name="Latitude" Type="decimal" Precision="9" Scale="6" />
+    <Property Name="Longitude" Type="decimal" Precision="9" Scale="6" />
+    <Property Name="Descricao" Type="varchar(max)" />
+    <Property Name="Ativo" Type="bit" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Promocao">
+    <Key>
+      <PropertyRef Name="PromocaoId" />
+    </Key>
+    <Property Name="PromocaoId" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="EmpresaId" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Titulo" Type="varchar" MaxLength="120" />
+    <Property Name="Descricao" Type="varchar(max)" />
+    <Property Name="PrecoNormal" Type="decimal" Precision="10" Scale="2" />
+    <Property Name="PrecoComDesconto" Type="decimal" Precision="10" Scale="2" />
+    <Property Name="TipoDesconto" Type="char" MaxLength="10" />
+    <Property Name="Desconto" Type="decimal" Precision="10" Scale="2" />
+    <Property Name="DescDesconto" Type="varchar" MaxLength="50" />
+    <Property Name="DataInicio" Type="datetime" />
+    <Property Name="DataFim" Type="datetime" />
+    <Property Name="TipoAnuncio" Type="varchar" MaxLength="10" />
+    <Property Name="CodigoPromocao" Type="varchar" MaxLength="20" />
+    <Property Name="ModoUso" Type="varchar(max)" />
+    <Property Name="LinkPromocao" Type="varchar" MaxLength="150" />
+    <Property Name="Tags" Type="varchar" MaxLength="200" />
+    <Property Name="CategoriaId" Type="int" />
+    <Property Name="Ativo" Type="bit" />
+    <Property Name="Impressoes" Type="int" />
+    <Property Name="ViewsPagina" Type="int" />
+    <Property Name="ViewsCodigo" Type="int" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+    <Property Name="MostraEndereco" Type="bit" />
+    <Property Name="MostraTelefone" Type="bit" />
+    <Property Name="MostraSite" Type="bit" />
+    <Property Name="MostraEmail" Type="bit" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
+  <EntityType Name="Usuario">
+    <Key>
+      <PropertyRef Name="UsuarioId" />
+    </Key>
+    <Property Name="UsuarioId" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Nome" Type="varchar" MaxLength="50" />
+    <Property Name="Email" Type="varchar" MaxLength="100" />
+    <Property Name="Senha" Type="varchar" MaxLength="20" />
+    <Property Name="Status" Type="varchar" MaxLength="20" />
+    <Property Name="Ativo" Type="bit" />
+    <Property Name="TagAcao" Type="varchar" MaxLength="500" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+    <Property Name="UF" Type="varchar" MaxLength="2" />
+    <Property Name="Cidade" Type="varchar" MaxLength="200" />
+    <Property Name="Bairro" Type="varchar" MaxLength="100" />
+    <Property Name="CPF" Type="varchar" MaxLength="15" />
+    <Property Name="Celular" Type="varchar" MaxLength="15" />
+    <Property Name="Sexo" Type="varchar" MaxLength="1" />
+    <Property Name="CampanhasAbertas" Type="varchar" MaxLength="500" />
+    <Property Name="CampanhasClicadas" Type="varchar" MaxLength="500" />
+    <Property Name="CampanhasEnviadas" Type="varchar" MaxLength="800" />
+  </EntityType>
+  <EntityType Name="UsuarioEmpresa">
+    <Key>
+      <PropertyRef Name="UsuarioEmpresaId" />
+    </Key>
+    <Property Name="UsuarioEmpresaId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UsuarioId" Type="uniqueidentifier" />
+    <Property Name="EmpresaId" Type="uniqueidentifier" />
+    <Property Name="CriadoEm" Type="datetime" />
+    <Property Name="AtualizadoEm" Type="datetime" />
+  </EntityType>
+  <Association Name="FK_Promocao_Categoria">
+    <End Role="Categoria" Type="Self.Categoria" Multiplicity="0..1" />
+    <End Role="Promocao" Type="Self.Promocao" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Categoria">
+        <PropertyRef Name="CategoriaId" />
+      </Principal>
+      <Dependent Role="Promocao">
+        <PropertyRef Name="CategoriaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Promocao_Empresa">
+    <End Role="Empresa" Type="Self.Empresa" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Promocao" Type="Self.Promocao" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Empresa">
+        <PropertyRef Name="EmpresaId" />
+      </Principal>
+      <Dependent Role="Promocao">
+        <PropertyRef Name="EmpresaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsuarioEmpresa_Empresa">
+    <End Role="Empresa" Type="Self.Empresa" Multiplicity="0..1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="UsuarioEmpresa" Type="Self.UsuarioEmpresa" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Empresa">
+        <PropertyRef Name="EmpresaId" />
+      </Principal>
+      <Dependent Role="UsuarioEmpresa">
+        <PropertyRef Name="EmpresaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsuarioEmpresa_Usuario">
+    <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="UsuarioEmpresa" Type="Self.UsuarioEmpresa" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Usuario">
+        <PropertyRef Name="UsuarioId" />
+      </Principal>
+      <Dependent Role="UsuarioEmpresa">
+        <PropertyRef Name="UsuarioId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="promocaoagoraModelStoreContainer">
+    <EntitySet Name="Campanha" EntityType="Self.Campanha" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Categoria" EntityType="Self.Categoria" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Empresa" EntityType="Self.Empresa" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Promocao" EntityType="Self.Promocao" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="UsuarioEmpresa" EntityType="Self.UsuarioEmpresa" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Promocao_Categoria" Association="Self.FK_Promocao_Categoria">
+      <End Role="Categoria" EntitySet="Categoria" />
+      <End Role="Promocao" EntitySet="Promocao" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Promocao_Empresa" Association="Self.FK_Promocao_Empresa">
+      <End Role="Empresa" EntitySet="Empresa" />
+      <End Role="Promocao" EntitySet="Promocao" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsuarioEmpresa_Empresa" Association="Self.FK_UsuarioEmpresa_Empresa">
+      <End Role="Empresa" EntitySet="Empresa" />
+      <End Role="UsuarioEmpresa" EntitySet="UsuarioEmpresa" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsuarioEmpresa_Usuario" Association="Self.FK_UsuarioEmpresa_Usuario">
+      <End Role="Usuario" EntitySet="Usuario" />
+      <End Role="UsuarioEmpresa" EntitySet="UsuarioEmpresa" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

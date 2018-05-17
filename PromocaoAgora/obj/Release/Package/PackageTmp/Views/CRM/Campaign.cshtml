@@ -1,0 +1,98 @@
+﻿
+@{
+
+   ViewBag.Title = "Campaign";
+}
+
+
+<link href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+<script src="https://use.fontawesome.com/8ddc09daaf.js"></script>
+
+<script>
+    function buttonedit(id) {
+        location = "/clusters/Criar?clusterId=" + id;
+    }
+
+    //function buttondetail(id) {
+    //    location = "/clusters/Details?clusterId=" + id;
+    //}
+    function DeletaCluster(id) {
+        location = "/clusters/Delete?clusterId=" + id;
+    }
+
+
+    $(document).ready(function () {
+        $("#myTable").DataTable({
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "stateSave": true,  //restore table state on page reload,
+            "orderMulti": true, // for disable multiple column at once
+            "select": true,
+            "ajax": {
+                "url": "/CRM/CampaignData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+                { "data": "CampanhaId", "name": "CampanhaId", "autoWidth": true },
+                { "data": "Nome", "name": "Nome", "autoWidth": true },
+                { "data": "EmailEnvios", "name": "EmailEnvios", "autoWidth": true },
+                { "data": "EmailAberturas", "name": "EmailAberturas", "autoWidth": true },
+                { "data": "EmailClicks", "name": "EmailClicks", "autoWidth": true },
+                //{ "data": "CriadoEm", "name": "CriadoEm", "autoWidth": true },
+                { "data": "AtualizadoEm", "name": "AtualizadoEm", "autoWidth": true },
+                
+                {
+                    "data": "CampanhaId",
+                    "autoWidth": false,
+                    bSortable: false,
+                    mRender: function (data, type, full) {
+                        return "<button type='button' title='Editar' onclick='buttonedit(" + data + ");'><i class='fa fa-pencil' style='font-size: 22px;'></i></button>" + " " +
+                            "<button type='button' title='Deletar' onclick='DeletaCluster(" + data + ")'><i class='ui-tooltip fa fa-trash' style='font-size: 22px;'></i></button>";
+
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+<p><a href="/">Home</a> >> Campanhas</p>
+<h2 class="page-header">Campanhas</h2>
+
+
+
+<div class="my-2">
+    <table id="myTable" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Nome
+                </th>
+                <th>
+                    Envios
+                </th>
+                <th>
+                    Aberturas
+                </th>
+                <th>
+                    Clicks
+                </th>
+                @*<th>
+                    Criado em
+                </th>*@
+                <th>
+                    Atualizado em
+                </th>
+                <th style="width:60px;"></th>
+            </tr>
+        </thead>
+    </table>
+</div>

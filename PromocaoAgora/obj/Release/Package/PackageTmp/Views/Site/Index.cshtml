@@ -1,0 +1,388 @@
+﻿
+@{
+    ViewBag.Title = "Promoção Agora - Descubra as Promoções perto de você";
+}
+@section Scripts{
+<script type="text/javascript">
+
+    //global vars
+    var lat = 0;//-22.947692;
+    var lgt = 0;//-43.340189;
+    var page = 1;
+
+    //alert(removerAcentos("Promoção Agora Descubra as Promoções perto de você"));
+
+    if (!String.format) {
+        String.format = function (format) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return format.replace(/{(\d+)}/g, function (match, number) {
+                return typeof args[number] != 'undefined'
+                    ? args[number]
+                    : match
+                    ;
+            });
+        };
+    }
+
+    var map = { "â": "a", "Â": "A", "à": "a", "À": "A", "á": "a", "Á": "A", "ã": "a", "Ã": "A", "ê": "e", "Ê": "E", "è": "e", "È": "E", "é": "e", "É": "E", "î": "i", "Î": "I", "ì": "i", "Ì": "I", "í": "i", "Í": "I", "õ": "o", "Õ": "O", "ô": "o", "Ô": "O", "ò": "o", "Ò": "O", "ó": "o", "Ó": "O", "ü": "u", "Ü": "U", "û": "u", "Û": "U", "ú": "u", "Ú": "U", "ù": "u", "Ù": "U", "ç": "c", "Ç": "C", " ": "-", "%": "porcento", ",": "", "&": "e" };
+
+
+    function removerAcentos(s) { return s.replace(/[\W\[\] ]/g, function (a) { return map[a] || a }) };
+
+    
+
+    //function formataDinheiro(n) {
+    //    return "R$ " + n.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+\,)/g, "$1.");
+    //}
+
+    //function formataPorcentagem(n) {
+    //    return n.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+\,)/g, "$1.") + "%";
+    //}
+
+    //function formataDec2(n) {
+    //    return n.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+\,)/g, "$1.");
+    //}
+
+    function getLocation() {
+        //alert("incio");
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+            
+            //alert("entrei");
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+        var dfrd1 = $.Deferred();
+        return dfrd1.promise();
+    }
+    function showPosition(position) {
+        //alert("oi");
+        var google_map_pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+        var google_maps_geocoder = new google.maps.Geocoder();
+        google_maps_geocoder.geocode(
+            { 'latLng': google_map_pos },
+            function (results, status) {
+                //alert(results);
+                $("#txt_local").val(results[0].formatted_address);
+                lat = position.coords.latitude;
+                $("#hid_lat").val(lat);
+                lgt = position.coords.longitude;
+                $("#hid_lgt").val(lgt);
+                //alert("entrou");
+            }
+        );
+        //x.innerHTML = "Latitude: " + position.coords.latitude +
+        //    "<br>Longitude: " + position.coords.longitude;
+    }
+
+    function callLista(pag, latitude, longitude, tipoAnuncio, q) {
+        var td = "";
+        var urlservice = String.format("/api/ListaPromo?p={0}&ulat={1}&ulon={2}&tipo={3}&q={4}", pag, latitude, longitude, tipoAnuncio, q);
+        //alert(lat + ' ' + lgt);
+        //alert(urlservice);
+        var jqxhr = $.ajax({
+            url: urlservice,
+            beforeSend: function () {
+                $("#listaA").text("loading...");
+            }
+        })
+            
+            .done(function (data) {
+                //console.log(data);
+                //alert(data.PromoCards.length);
+                var pms = "";
+                for (i = 0; i < data.PromoCards.length; i++) {
+                    pms += "<div class='reg mt-3'><div class='row'>";
+                    //pms += "<div class='col- auto'><img class='imgw40' src='/Content/img/alimentacao.jpg' alt=''></div>";
+                    pms += "<div class='col-12'><div class='row'><div class='col-md-9'>";
+                    
+                    if (data.PromoCards[i].TipoAnuncio == 'Web') {
+                        pms += "<div class='f-verde f8r'><span class='font-weight-bold'>Oferta Web</span></div>";
+                        //pms += String.format("<div class='f-verde f9r'><span class='font-weight-bold'>{0}</span> - <span class='f-verde f8r'>{1}</span></div>", data.PromoCards[i].EmpresaNome, data.PromoCards[i].Site);
+                    } else {
+                        pms += String.format("<div class='f-verde f8r'><span class='font-weight-bold'>{0} Km</span> - {1} </div>", formataDec2(data.PromoCards[i].Distancia), data.PromoCards[i].Bairro);
+                    }
+                    var plink = removerAcentos(data.PromoCards[i].Titulo);
+                    pms += String.format("<span class='f11r subtitulo'><a href='/p/{3}/{2}'>{0} - {1} Off</a></span><br />", data.PromoCards[i].Titulo, formataPorcentagem(data.PromoCards[i].Desconto), data.PromoCards[i].PromoId, plink);
+                    pms += String.format("<span class='f-verde f8r font-weight-bold'>{0}</span><br />", data.PromoCards[i].EmpresaNome);
+                    if (data.PromoCards[i].TipoAnuncio == 'Web') {
+                        pms += String.format("<div class='f-verde f8r'><i class='fa fa-map-marker'></i> {0}</div>", data.PromoCards[i].Site);
+                    } else {
+                        pms += String.format("<div class='f-verde f8r hidden-md-down'><i class='fa fa-map-marker'></i> {0}</div>", data.PromoCards[i].Endereco);
+                    }
+                    td = data.PromoCards[i].TipoDesconto.trim();
+                    //alert(td);
+                    if (td == "P") {
+                        pms += String.format("<div>Preço: <span class='f12r f-verde font-weight-bold'>{0}</span> <span id='aPrecoNormal' class='rabiscado f8r'>({1})</span></div></div>", formataDinheiro(data.PromoCards[i].PrecoComDesconto), formataDinheiro(data.PromoCards[i].PrecoNormal));
+                    } else if (td == "C") {
+                        pms += String.format("<div>Desc.: <span class='f12r f-verde font-weight-bold'>{0}</span> <span id='descdesc' class='f-verde f8r'> ({1})</span></div></div>", formataPorcentagem(data.PromoCards[i].Desconto), data.PromoCards[i].DescDesconto);
+                    }
+                    pms += String.format("<div class='col-md-3 hidden-md-down'><button class='btn btn-sm btn-success f-branca'>Válido até {0}</button></div>", data.PromoCards[i].DataFim);
+                    pms += "</div></div></div></div>";
+                }
+
+                $("#listaA").html(pms);
+
+                //pagination
+                //alert(pag);
+                var pagin = "";
+                var k = $("#txt_busca").val();
+                if (data.Paginas > 1) {
+                    
+                    //alert("passei");
+                    if (pag > 1) {
+                        pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\", \"{4}\" );'>Anterior</a></li>", pag - 1, latitude, longitude, tipoAnuncio, k);
+                    }
+                    else {
+                        pagin += "<li class='page-item disabled'><a class='page-link' href='#'>Anterior</a></li>";
+                    }
+                    for (j = 1; j <= data.Paginas; j++) {
+                        if (j == pag) {
+                            pagin += String.format("<li class='page-item active'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\", \"{4}\");'>{0}</a></li>", j, latitude, longitude, tipoAnuncio.toString(), k);
+                        } else {
+                            pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\", \"{4}\");'>{0}</a></li>", j, latitude, longitude, tipoAnuncio.toString(), k);
+                            //pagin += "<li class='page-item'><a class='page-link' href='javascript:callLista(" + j + ", " + latitude + ", " + longitude + ", " + tipoAnuncio + "); '>" + j + "</a></li>";
+                        }
+                    }
+                    if (pag == data.Paginas) {
+                        pagin += "<li class='page-item disabled'><a class='page-link' href='#'>Próximo</a></li>";
+                    }
+                    else {
+                        pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\", \"{4}\");'>Próximo</a></li>", pag + 1, latitude, longitude, tipoAnuncio, k);
+                    }
+
+                    
+                }
+                $(".pagination").html(pagin);
+            })
+            .fail(function () {
+                alert(errorThrown + textStatus);
+            })
+            .always(function () {
+                //alert("complete");
+                $(document).scrollTop($("#inicio").offset().top);
+            });
+    }
+
+    getLocation();
+
+    $(document).ready(function () {
+        //inicio programa
+        
+        
+        
+        //var allquery = $("#allquery").val();
+        var keyword = "";
+        var tipoanuncio = "Local";
+        function initprogramm()
+        {
+            if (lat != 0) {
+                //console.log('function1 is done!');
+                lat = $("#hid_lat").val();
+                lgt = $("#hid_lgt").val();
+                callLista(page, lat, lgt, tipoanuncio, keyword);
+                //alert("lat:" + lat + ", lgt:" + lgt);
+            }
+            else {
+                setTimeout(initprogramm, 250);
+            }
+        };
+        
+        initprogramm();
+
+
+        $("#OfertaWeb").click(function () {
+            //callLista(page, lat, lgt, "Web", "");
+            tipoanuncio = "Web";
+            callLista(page, lat, lgt, tipoanuncio, keyword);
+        })
+        $("#OfertaLocal").click(function () {
+            //callLista(page, lat, lgt, "Local", "");
+            tipoanuncio = "Local";
+            callLista(page, lat, lgt, tipoanuncio, keyword);
+        })
+        $("#txt_busca").keyup(function () {
+            //callLista(page, lat, lgt, tipoanuncio, keyword);
+            keyword = $("#txt_busca").val();
+            callLista(page, lat, lgt, tipoanuncio, keyword);
+        })
+        $("#btnBusca").click(function () {
+            //callLista(page, lat, lgt, tipoanuncio, keyword);
+            keyword = $("#txt_busca").val();
+            callLista(page, lat, lgt, tipoanuncio, keyword);
+        })
+        
+    });
+    
+</script>
+    }
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <input type="text" id="txt_busca" placeholder="Digite o que você quer buscar" style="width:70%" />
+        <button type="button" id="btnBusca" class="btn btnGD">Buscar</button><br/>
+        @*<i class="fa fa-angle-right f-azul"></i> <a href="#">Filtrar por localidade</a>*@
+    </div>
+    <div class="col-md-6 hidden-sm-down">
+        <span>Minha localização:</span><br/>
+        <img src="~/Content/img/local_icon.png" />
+        <input type="text" id="txt_local" placeholder="Localização Atual" class="f8r formSemBorda" style="width:95%;" /><br/>
+        <input type="hidden" id="hid_lat" />
+        <input type="hidden" id="hid_lgt" />
+        @*<button type="button" class="btn btn-sm btn-info" onclick="getLocation()">Alterar seu local</button>*@
+        @*<input type="text" id="allquery" />*@
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-9">
+        <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="OfertaLocal" data-toggle="pill" href="#home" role="tab">Mais Próximas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="OfertaWeb" data-toggle="pill" href="#" role="tab">Ofertas Web</a>
+            </li>
+           
+            
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="" id="ho">
+
+                <div id="listaA"></div>
+                <div id="paginacao" class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+                        
+                    </ul>
+                </div>
+
+
+                <!-- two columns -->
+                @*<div class="row">
+                    <div class="col-md-6">
+                        <div class="reg mt-3 p-3">
+                            <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                            <div class="f12r subtitulo"><a href="/site/promocao">Parmegiana Factory: Parmegiana de Filé-Mignon, Frango ou Berinjela para 1 ou 2 Pessoas</a></div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                    
+                                    <div>a partir de <span class="f16r f-verde font-weight-bold">R$ 49,99</span></div>
+                                </div>
+                                <div class="col-md-4 pt-2">
+                                    <!--<img class="imgw40 hidden-sm-down" src="~/Content/img/alimentacao.jpg" alt="">
+                                    <span class="f8r">ALIMENTAÇÃO</span>-->
+                                    <a href="#" class="btn btn-sm btn-success sansserif">Ver Código <br />de Promoção</a>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="reg mt-3 p-3">
+                            <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                            <div class="f12r subtitulo"><a href="/site/promocao">Rodízio de massa por 30 reais apenas! - 30% Off</a></div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                    
+                                    <div>a partir de <span class="f16r f-verde font-weight-bold">R$ 49,99</span></div>
+                                </div>
+                                <div class="col-md-4 pt-2">
+                                    <!--<img class="imgw40 hidden-sm-down" src="~/Content/img/alimentacao.jpg" alt="">
+                                    <span class="f8r">ALIMENTAÇÃO</span>-->
+                                    <button class="btn btn-sm verde f-branca">Expira em <br />12/01/2018</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- line -->
+                @*<div class="row">
+                    <div class="col-md-6">
+                        <div class="reg mt-3 p-3">
+                            <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                            <div class="f12r subtitulo"><a href="#">Thermas de Olímpia Resort/SP: até 7 noites para 2 adultos + 3 Crianças de até 12 anos em até 12x - 30% Off</a></div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                    
+                                    <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <img class="imgw40 hidden-sm-down" src="~/Content/img/alimentacao.jpg" alt="">
+                                    <span class="f8r">ALIMENTAÇÃO</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="reg mt-3 p-3">
+                            <div class=" f-verde f8r font-weight-bold">0,5 Km  - Freguesia</div>
+                            <div class="f12r subtitulo"><a href="#">Rodízio de massa por 30 reais apenas! - 30% Off</a></div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class=" f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</div>
+                                    <div>a partir de <span class=" f16r f-verde">R$ 49,99</span></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <img class="imgw40 hidden-sm-down" src="~/Content/img/alimentacao.jpg" alt="">
+                                    <span class="f8r">ALIMENTAÇÃO</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+                <!-- two columns -->
+
+                
+
+                @*<div class="reg mt-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <img class="imgw40" src="~/Content/img/alimentacao.jpg" alt="">
+                        </div>
+                        <div class="col-10">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="f-verde f8r"><span class="font-weight-bold">0,5 Km</span> - Freguesia</div>
+                                    <span class="f12r subtitulo"><a href="/site/promocao">Rodízio de massa por 30 reais apenas! - 30% Off</a></span><br />
+                                    <span class="f-verde f9r font-weight-bold">Restaurante Rio Das Ostras</span><br />
+                                    <div>Preço: <span class="f14r f-verde font-weight-bold">R$ 30,00</span></div>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                    <button class="btn btn-sm btn-danger f-branca">Expira em 12/01/2018</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>*@
+
+
+
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="col-md-3 pt-5">
+        @*<h5>CATEGORIAS</h5>
+        <p><a href="#">ALIMENTAÇÃO</a></p>
+        <p><a href="#">CASA E ESCRITÓRIO</a></p>
+        <p><a href="#">EDUCAÇÃO</a></p>
+        <p><a href="#">ENTRETENIMENTO</a></p>
+        <p><a href="#">ESPORTE</a></p>
+        <p><a href="#">ROUPA E ACESSÓRIOS</a></p>
+        <p><a href="#">SAÚDE</a></p>
+        <p><a href="#">TECNOLOGIA</a></p>
+        <p><a href="#">TRANSPORTE</a></p>
+        <p><a href="#">VIAGEM</a></p>*@
+</div>
+</div>

@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="promocaoagoraModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Categoria">
+    <Key>
+      <PropertyRef Name="CategoriaId" />
+    </Key>
+    <Property Name="CategoriaId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Nome" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Pai" Type="Int32" />
+    <Property Name="Tags" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="Ativo" Type="Boolean" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Promocaos" Relationship="Self.FK_Promocao_Categoria" FromRole="Categoria" ToRole="Promocao" />
+  </EntityType>
+  <EntityType Name="Empresa">
+    <Key>
+      <PropertyRef Name="EmpresaId" />
+    </Key>
+    <Property Name="EmpresaId" Type="Guid" Nullable="false" />
+    <Property Name="Nome" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Telefone" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="Celular" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="CNPJ" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Responsavel" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+    <Property Name="CPFResponsavel" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="Logradouro" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Numero" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Complemento" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Bairro" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Cidade" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="UF" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+    <Property Name="CEP" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="Ativo" Type="Boolean" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Promocaos" Relationship="Self.FK_Promocao_Empresa" FromRole="Empresa" ToRole="Promocao" />
+    <NavigationProperty Name="UsuarioEmpresas" Relationship="Self.FK_UsuarioEmpresa_Empresa" FromRole="Empresa" ToRole="UsuarioEmpresa" />
+    <Property Name="Site" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Latitude" Type="Decimal" Precision="9" Scale="6" />
+    <Property Name="Longitude" Type="Decimal" Precision="9" Scale="6" />
+    <Property Name="Descricao" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Promocao">
+    <Key>
+      <PropertyRef Name="PromocaoId" />
+    </Key>
+    <Property Name="PromocaoId" Type="Guid" Nullable="false" />
+    <Property Name="EmpresaId" Type="Guid" Nullable="false" />
+    <Property Name="Titulo" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
+    <Property Name="Descricao" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="PrecoNormal" Type="Decimal" Precision="10" Scale="2" />
+    <Property Name="PrecoComDesconto" Type="Decimal" Precision="10" Scale="2" />
+    <Property Name="Desconto" Type="Decimal" Precision="10" Scale="2" annotation:StoreGeneratedPattern="None" />
+    <Property Name="DataInicio" Type="DateTime" Precision="3" />
+    <Property Name="DataFim" Type="DateTime" Precision="3" />
+    <Property Name="TipoAnuncio" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="CodigoPromocao" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="ModoUso" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="LinkPromocao" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Tags" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="CategoriaId" Type="Int32" />
+    <Property Name="Ativo" Type="Boolean" />
+    <Property Name="Impressoes" Type="Int32" />
+    <Property Name="ViewsPagina" Type="Int32" />
+    <Property Name="ViewsCodigo" Type="Int32" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Categoria" Relationship="Self.FK_Promocao_Categoria" FromRole="Promocao" ToRole="Categoria" />
+    <NavigationProperty Name="Empresa" Relationship="Self.FK_Promocao_Empresa" FromRole="Promocao" ToRole="Empresa" />
+    <Property Name="TipoDesconto" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+    <Property Name="DescDesconto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="MostraEndereco" Type="Boolean" />
+    <Property Name="MostraTelefone" Type="Boolean" />
+    <Property Name="MostraSite" Type="Boolean" />
+    <Property Name="MostraEmail" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="Usuario">
+    <Key>
+      <PropertyRef Name="UsuarioId" />
+    </Key>
+    <Property Name="UsuarioId" Type="Guid" Nullable="false" />
+    <Property Name="Nome" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Senha" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Ativo" Type="Boolean" />
+    <Property Name="TagAcao" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="UsuarioEmpresas" Relationship="Self.FK_UsuarioEmpresa_Usuario" FromRole="Usuario" ToRole="UsuarioEmpresa" />
+    <Property Name="UF" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+    <Property Name="Cidade" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="Bairro" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="CPF" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="Celular" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="Sexo" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+    <Property Name="CampanhasAbertas" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Name="CampanhasClicadas" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Name="CampanhasEnviadas" Type="String" MaxLength="800" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="UsuarioEmpresa">
+    <Key>
+      <PropertyRef Name="UsuarioEmpresaId" />
+    </Key>
+    <Property Name="UsuarioEmpresaId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UsuarioId" Type="Guid" />
+    <Property Name="EmpresaId" Type="Guid" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Empresa" Relationship="Self.FK_UsuarioEmpresa_Empresa" FromRole="UsuarioEmpresa" ToRole="Empresa" />
+    <NavigationProperty Name="Usuario" Relationship="Self.FK_UsuarioEmpresa_Usuario" FromRole="UsuarioEmpresa" ToRole="Usuario" />
+  </EntityType>
+  <Association Name="FK_Promocao_Categoria">
+    <End Role="Categoria" Type="Self.Categoria" Multiplicity="0..1" />
+    <End Role="Promocao" Type="Self.Promocao" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Categoria">
+        <PropertyRef Name="CategoriaId" />
+      </Principal>
+      <Dependent Role="Promocao">
+        <PropertyRef Name="CategoriaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Promocao_Empresa">
+    <End Role="Empresa" Type="Self.Empresa" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Promocao" Type="Self.Promocao" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Empresa">
+        <PropertyRef Name="EmpresaId" />
+      </Principal>
+      <Dependent Role="Promocao">
+        <PropertyRef Name="EmpresaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsuarioEmpresa_Empresa">
+    <End Role="Empresa" Type="Self.Empresa" Multiplicity="0..1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="UsuarioEmpresa" Type="Self.UsuarioEmpresa" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Empresa">
+        <PropertyRef Name="EmpresaId" />
+      </Principal>
+      <Dependent Role="UsuarioEmpresa">
+        <PropertyRef Name="EmpresaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsuarioEmpresa_Usuario">
+    <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="UsuarioEmpresa" Type="Self.UsuarioEmpresa" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Usuario">
+        <PropertyRef Name="UsuarioId" />
+      </Principal>
+      <Dependent Role="UsuarioEmpresa">
+        <PropertyRef Name="UsuarioId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="promocaoagoraEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Categorias" EntityType="Self.Categoria" />
+    <EntitySet Name="Empresas" EntityType="Self.Empresa" />
+    <EntitySet Name="Promocaos" EntityType="Self.Promocao" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+    <EntitySet Name="Usuarios" EntityType="Self.Usuario" />
+    <EntitySet Name="UsuarioEmpresas" EntityType="Self.UsuarioEmpresa" />
+    <AssociationSet Name="FK_Promocao_Categoria" Association="Self.FK_Promocao_Categoria">
+      <End Role="Categoria" EntitySet="Categorias" />
+      <End Role="Promocao" EntitySet="Promocaos" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Promocao_Empresa" Association="Self.FK_Promocao_Empresa">
+      <End Role="Empresa" EntitySet="Empresas" />
+      <End Role="Promocao" EntitySet="Promocaos" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsuarioEmpresa_Empresa" Association="Self.FK_UsuarioEmpresa_Empresa">
+      <End Role="Empresa" EntitySet="Empresas" />
+      <End Role="UsuarioEmpresa" EntitySet="UsuarioEmpresas" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsuarioEmpresa_Usuario" Association="Self.FK_UsuarioEmpresa_Usuario">
+      <End Role="Usuario" EntitySet="Usuarios" />
+      <End Role="UsuarioEmpresa" EntitySet="UsuarioEmpresas" />
+    </AssociationSet>
+    <EntitySet Name="Campanhas" EntityType="promocaoagoraModel.Campanha" />
+  </EntityContainer>
+  <EntityType Name="Campanha">
+    <Key>
+      <PropertyRef Name="CampanhaId" />
+    </Key>
+    <Property Name="CampanhaId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Nome" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="EmailEnvios" Type="Int32" />
+    <Property Name="EmailAberturas" Type="Int32" />
+    <Property Name="EmailClicks" Type="Int32" />
+    <Property Name="CriadoEm" Type="DateTime" Precision="3" />
+    <Property Name="AtualizadoEm" Type="DateTime" Precision="3" />
+  </EntityType>
+</Schema>

@@ -1,0 +1,192 @@
+﻿@model PromocaoAgora.Models.Empresa
+@{
+    Layout = null;
+}
+<style type="text/css">
+    label{
+        font-weight:bold;
+    }
+    .Editor-container {
+        margin-top: 0px !important;
+    }
+    .Editor-editor{
+        height:130px !important;
+    }
+</style>
+<script src="~/Scripts/jquery.mask.min.js"></script>
+<link href="~/Content/Components/EditorLineControl/editor.css" rel="stylesheet" />
+<script src="~/Content/Components/EditorLineControl/editor.js"></script>
+<script type="text/javascript">
+    $(".phone_with_ddd").mask('(00) 00000-0000');
+    $('.cep').mask('00000-000');
+    $('.cpf').mask('000.000.000-00', { reverse: true });
+    $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+
+    $(document).ready(function () {
+
+        var editor = $("#txt_descricao").Editor();
+        var desc = $("#txt_descricao").text();
+        $("#txt_descricao").Editor("setText", desc);
+
+        $("#txt_cepEmpresa").focusout(function () {
+            var urlCep = "https://viacep.com.br/ws/" + $("#txt_cepEmpresa").val() + "/json/";
+            var requestcep = $.ajax({
+                url: urlCep,
+                method: "GET"
+            });
+
+            requestcep.done(function (obj) {
+                //alert(obj.logradouro);
+                $("#splogradouro").text(obj.logradouro);
+                $("#txt_logradouro").val(obj.logradouro);
+                $("#spbairro").text(obj.bairro);
+                $("#txt_bairro").val(obj.bairro);
+                $("#spcidade").text(obj.localidade);
+                $("#txt_cidade").val(obj.localidade);
+                $("#spuf").text(obj.uf);
+                $("#txt_uf").val(obj.uf);
+
+                
+
+            });
+
+            requestcep.fail(function (jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+        });
+
+        //$("#txt_numEndereco").focusout(function () {
+        //    //Get latitude e longitude
+        //    var geocoder = new google.maps.Geocoder();//new GClientGeocoder();
+
+        //    var address = $("#txt_logradouro").val() + ", " + $("#txt_numEndereco").val() + " - " + $("#txt_bairro").val() + " - " + $("#txt_cidade").val() + " - " + $("#txt_uf").val();
+        
+        //    geocoder.geocode({ 'address': address }, function (results, status) {
+        //        if (status == google.maps.GeocoderStatus.OK) {
+        //            latitude = results[0].geometry.location.lat();
+        //            longitude = results[0].geometry.location.lng();   
+        //        } else {
+        //            alert('Geocode was not successful for the following reason: ' + status);
+        //        }
+        //    });
+        //});
+
+
+
+        $("#btn-EditEmpresa").click(function () {
+            //Get latitude e longitude
+            var geocoder = new google.maps.Geocoder();//new GClientGeocoder();
+            var EmpLatitude = "";
+            var EmpLongitude = "";
+            var address = $("#txt_logradouro").val() + ", " + $("#txt_numEndereco").val() + " - " + $("#txt_bairro").val() + " - " + $("#txt_cidade").val() + " - " + $("#txt_uf").val();
+
+            geocoder.geocode({ 'address': address }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    EmpLatitude = results[0].geometry.location.lat();
+                    EmpLongitude = results[0].geometry.location.lng();
+                    $("#hid_latitude").val(EmpLatitude);
+                    $("#hid_longitude").val(EmpLongitude);
+
+                    //Monta a classe Empresa
+                    var empresa = {
+                        EmpresaId: $("#hid_empresaid").val(),
+                        Nome: $("#txt_nomeEmpresa").val(),
+                        Telefone: $("#txt_telEmpresa").val(),
+                        Celular: $("#txt_celularEmpresa").val(),
+                        Site: $("#txt_siteEmpresa").val(),
+                        CNPJ: $("#txt_cnpjEmpresa").val(),
+                        CPFResponsavel: $("#txt_cpfEmpresa").val(),
+                        Email: $("#txt_emailEmpresa").val(),
+                        Responsavel: $("#txt_respEmpresa").val(),
+                        CEP: $("#txt_cepEmpresa").val(),
+                        Logradouro: $("#txt_logradouro").val(),
+                        Bairro: $("#txt_bairro").val(),
+                        Cidade: $("#txt_cidade").val(),
+                        UF: $("#txt_uf").val(),
+                        Numero: $("#txt_numEndereco").val(),
+                        Complemento: $("#txt_compEndereco").val(),
+                        Latitude: $("#hid_latitude").val(),
+                        Longitude: $("#hid_longitude").val(),
+                        Descricao: $("#txt_descricao").Editor("getText")
+                    }
+                    //alert(empresa.Latitude);
+                    $.post("/api/UpdateEmpresa", empresa)
+                        .done(function (data) {
+                            if (data.responseStatus == "OK") {
+                                alert(data.desc);
+                                location = "/site/areacliente";
+                            } else {
+                                alert(data.desc);
+                            }
+                        })
+                        .fail(function () {
+                            var erro = "Ocorreu um Erro. Volte mais tarde, por favor.";
+                            if (empresa.Descricao.length > 1000) {
+                               erro = "O campo Descrição da Empresa não pode conter mais de 1000 caracteres.";
+                            }
+                            alert(erro);
+                        });
+
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+            
+        });
+    });
+</script>
+
+    <fieldset id="FdcadastroEmpresa">
+
+        <div class="row">
+            <div class="col-md-6">
+                <input type="hidden" id="hid_empresaid" value="@Model.EmpresaId" />
+                <label>Nome:</label>
+                <input type="text" id="txt_nomeEmpresa" class="w-100 mb-2" maxlength="200" placeholder="Nome da Empresa ou Negócio" value="@Model.Nome" />
+                <label>Telefone (Principal):</label>
+                <input type="text" id="txt_telEmpresa" class="w-100 mb-2 phone_with_ddd" placeholder="Telefone da Empresa" value="@Model.Telefone" />
+                <label>Telefone 2:</label>
+                <input type="text" id="txt_celularEmpresa" class="w-100 mb-2 phone_with_ddd" placeholder="Outro telefone de contato" value="@Model.Celular" />
+                <label>Email da empresa</label> 
+                @*<input type="checkbox" id="publicaEmail" value="ok" class="ml-1" checked /> <span class="f8r">Mostrar no anúncio?</span>*@
+                <input type="email" id="txt_emailEmpresa" class="w-100 mb-2" maxlength="100" placeholder="Email da Empresa" value="@Model.Email" />
+                <label>Site:</label>
+                <input type="text" id="txt_siteEmpresa" class="w-100 mb-2" maxlength="150" placeholder="Site da Empresa" value="@Model.Site" />
+                <label>CNPJ:</label>
+                <input type="text" id="txt_cnpjEmpresa" class="w-100 mb-2 cnpj" placeholder="CNPJ (caso seja empresa)" value="@Model.CNPJ" />
+                <label>Digite o seu CPF:</label>
+                <input type="text" id="txt_cpfEmpresa" class="w-100 mb-2 cpf" placeholder="CPF do Responsável" value="@Model.CPFResponsavel" />
+
+            </div>
+            <div class="col-md-6">
+                <label>Descrição da empresa:</label>
+                <textarea rows="2" id="txt_descricao" class="w-100 mb-2" maxlength="1000" placeholder="">@Model.Descricao</textarea>
+                @*<label>Nome do Responsável (dono):</label>
+                <input type="text" id="txt_respEmpresa" class="w-100 mb-2" placeholder="Responsável pelo cadastro" value="@Model.CPFResponsavel" />*@
+                
+                <label>CEP:</label>
+                <input type="text" id="txt_cepEmpresa" class="w-100 mb-2 cep" placeholder="Informe o CEP" value="@Model.CEP" />
+                <label>Endereço:</label>
+                <p class="mb-1">
+                    <span id="splogradouro">@Model.Logradouro</span> <br />
+                    <span id="spbairro">@Model.Bairro</span> - <span id="spcidade">@Model.Cidade</span> - <span id="spuf">@Model.UF</span>
+                </p>
+                @*<input type="hidden" id="txt_userid" value="@Model.UsuarioEmpresas.First().UsuarioId" />*@
+                <input type="hidden" id="txt_logradouro" value="@Model.Logradouro" />
+                <input type="hidden" id="txt_bairro" value="@Model.Bairro" />
+                <input type="hidden" id="txt_cidade" value="@Model.Cidade" />
+                <input type="hidden" id="txt_uf" value="@Model.UF" />
+                <input type="hidden" id="hid_latitude" value="@Model.Latitude" />
+                <input type="hidden" id="hid_longitude" value="@Model.Longitude" />
+                <label>Número:</label>
+                <input type="text" id="txt_numEndereco" maxlength="20" class="w-100 mb-2" placeholder="Número (Endereço)" value="@Model.Numero" />
+                <label>Complemento:</label>
+                <input type="text" id="txt_compEndereco" class="w-100 mb-2" maxlength="20" placeholder="Complemento (Endereço)" value="@Model.Complemento" />
+            </div>
+        </div>
+        <div class="text-right">
+            <button id="btn-EditEmpresa" class="btn btn-primary">Atualizar Dados</button>
+        </div>
+    </fieldset>
+
+

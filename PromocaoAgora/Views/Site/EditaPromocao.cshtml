@@ -1,0 +1,329 @@
+﻿@model PromocaoAgora.Models.Promocao
+@{
+    ViewBag.Title = "Editar Promocao";
+    Layout = null;// "~/Views/Shared/simples.cshtml";
+    bool showEnd = false;
+    
+}
+<script src="~/Scripts/jquery.mask.min.js"></script>
+<link href="~/Content/Components/EditorLineControl/editor.css" rel="stylesheet" />
+<script src="~/Content/Components/EditorLineControl/editor.js"></script>
+<script type="text/javascript">
+    function calcdesc() {
+        var sempromo = $("#txt_prcSemPromo").val();
+        sempromo = sempromo.replace('.', '');
+        sempromo = sempromo.replace(',', '.');
+        var compromo = $("#txt_prcComPromo").val();
+        compromo = compromo.replace('.', '');
+        compromo = compromo.replace(',', '.');
+        //tratando
+        var desc = 100 - ((compromo / sempromo) * 100);
+
+        //console.log("DESC: " + desc);
+        if (compromo != '' && sempromo != '') {
+            if (desc > 100) {
+                alert("Atenção: O preço promocional deve ser menor que o preço sem desconto.");
+                $("#txt_prcComPromo").val('');
+            } else {
+                desc = desc.toFixed(2);
+                desc = desc.replace('.', ',');
+                $("#txtDesconto").text(desc);
+            }
+        }
+        else {
+            $("#txtDesconto").text('0');
+        }
+
+
+    }
+
+
+    $(document).ready(function () {
+        $('.money2').mask("#.##0,00", { reverse: true });
+        var tipodesc = "@Model.TipoDesconto";
+        //if (Model.MostraEndereco)
+        @{ 
+            if(Model.MostraEndereco == null)
+            {
+                Model.MostraEndereco = false;
+            }
+            if (Model.MostraTelefone == null)
+            {
+                Model.MostraTelefone = false;
+            }
+            if (Model.MostraSite == null)
+            {
+                Model.MostraSite = false;
+            }
+            if (Model.MostraEmail == null)
+            {
+                Model.MostraEmail = false;
+            }
+        }
+        var MostraEnd = "@Model.MostraEndereco";
+        var MostraTel = "@Model.MostraTelefone";
+        var MostraSite = "@Model.MostraSite";
+        var MostraEmail = "@Model.MostraEmail";
+        
+        if (MostraEnd == "True") {
+            $("#chk_EndShow").attr("checked", "checked");
+        }
+        if (MostraTel == "True") {
+            $("#chk_TelShow").attr("checked", "checked");
+        }
+        if (MostraSite == "True") {
+            $("#chk_SiteShow").attr("checked", "checked");
+        }
+        if (MostraEmail == "True") {
+            $("#chk_FormShow").attr("checked", "checked");
+        }
+        //alert(tipodesc);
+        if (tipodesc.indexOf('P') >= 0) {
+            $("#rad_desc1").attr("checked", "checked");
+            $("#rad_desc2").removeAttr("checked", "checked");
+            $("#divDescPreco").show();
+            $("#divDescCupom").hide();
+            //alert("oi");
+        }
+        else {
+            $("#rad_desc2").attr("checked", "checked");
+            $("#rad_desc1").removeAttr("checked", "checked");
+            $("#divDescPreco").hide();
+            $("#divDescCupom").show();
+        }
+
+
+        var editor = $("#txt_textAnuncio").Editor();
+        var editor2 = $("#txt_textModoUso").Editor();
+        var desc = $("#txt_textAnuncio").text();
+        var muso = $("#txt_textModoUso").text();
+        $("#txt_textAnuncio").Editor("setText", desc);
+        $("#txt_textModoUso").Editor("setText", muso);
+
+        calcdesc();
+
+        $("#txt_prcSemPromo").focusout(function () {
+            calcdesc();
+        });
+        $("#txt_prcComPromo").focusout(function () {
+            calcdesc();
+        });
+
+        $("#btn-cadastroPromocao").click(function () {
+            //get tipo de desconto
+            var tipodesc = $(".rad_desc:checked").val();
+            var desconto = "";
+            //alert(tipodesc);
+            if (tipodesc.indexOf('P') >= 0) {
+                desconto = $("#txtDesconto").text().replace(',', '.');
+            }
+            else {
+                desconto = $("#txt_desconto").val().replace(',', '.');
+            }
+            //alert(desconto);
+            var promocao = {
+                PromocaoId: $("#hid_promoid").val(),
+                Titulo: $("#txt_titAnuncio").val(),
+                Descricao: $("#txt_textAnuncio").Editor("getText"),
+                PrecoNormal: $("#txt_prcSemPromo").val().replace(',', '.'),
+                PrecoComDesconto: $("#txt_prcComPromo").val().replace(',', '.'),
+                TipoDesconto: tipodesc,
+                Desconto: desconto,
+                DescDesconto: $("#txt_cupom").val(),
+                DataInicio: $("#txt_perIniPromo").val(),
+                DataFim: $("#txt_perFimPromo").val(),
+                CategoriaId: $("#sel_categoria").val(),
+                TipoAnuncio: $("#sel_tipoAnuncio").val(),
+                ModoUso: $("#txt_textModoUso").Editor("getText"),
+                CodigoPromocao: $("#txt_codPromo").val(),
+                LinkPromocao: $("#txt_linkPromo").val(),
+                MostraEndereco: $('#chk_EndShow').is(":checked"),
+                MostraTelefone: $('#chk_TelShow').is(":checked"),
+                MostraSite: $('#chk_SiteShow').is(":checked"),
+                MostraEmail: $('#chk_EmailShow').is(":checked"),
+                Ativo: true
+            };
+            //console.log(promocao);
+            //validacoes
+            var validaFormPromo = true;
+            if (promocao.Titulo == null || promocao.Titulo == "") {
+                alert("O Título da promoção é obrigatório.");
+                validaFormPromo = false;
+            }
+            if (promocao.Descricao == null || promocao.Descricao == "") {
+                alert("A Descrição da promoção é obrigatório.");
+                validaFormPromo = false;
+            }
+            if (promocao.DataInicio == null || promocao.DataInicio == "") {
+                alert("A Data de Início da promoção é obrigatório.");
+                validaFormPromo = false;
+            }
+            if (promocao.DataFim == null || promocao.DataFim == "") {
+                alert("A Data de Fim da promoção é obrigatório.");
+                validaFormPromo = false;
+            }
+
+            //if (promocao.PrecoNormal == null || promocao.PrecoNormal == "") {
+            //    alert("O preço sem desconto da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.PrecoComDesconto == null || promocao.PrecoComDesconto == "") {
+            //    alert("O preço com desconto da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+
+            if ($('#chk_termo').is(":checked")) {
+                //
+            }
+            else {
+                validaFormPromo = false;
+                alert("Aceite os termos");
+            }
+            if (validaFormPromo) {
+                $.post("/api/UpdatePromocao", promocao)
+                    .done(function (data) {
+                        //console.log(data);
+                        if (data.responseStatus == "OK") {
+                            alert("Promoção alterada com sucesso.");
+                            location = "/site/areacliente";
+                        } else {
+                            alert(data.desc);
+                        }
+                    });
+            }
+
+        });
+
+        $("#sel_tipoAnuncio").change(function () {
+            if ($("#sel_tipoAnuncio").val() == "Web") {
+                //alert("ok");
+                $("#divlnkpromo").show();
+            }
+            else {
+                $("#divlnkpromo").hide();
+            }
+        });
+
+        if ($("#sel_tipoAnuncio").val() == "Web") {
+            //alert("ok");
+            $("#divlnkpromo").show();
+        }
+        else {
+            $("#divlnkpromo").hide();
+        }
+
+        $(".rad_desc").on("click", function () {
+            var tipodesc = $(".rad_desc:checked").val();
+
+            if (tipodesc == "P") {
+                $("#divDescPreco").show();
+                $("#divDescCupom").hide();
+            }
+            else {
+                $("#divDescPreco").hide();
+                $("#divDescCupom").show();
+            }
+        });
+    });
+</script>
+
+
+<fieldset id="FdcadastroPromocao">
+    <input type="hidden" id="hid_promoid" value="@Model.PromocaoId" />
+    <label>Título do Anúncio</label><br />
+    <input type="text" id="txt_titAnuncio" class="w-100 mb-2" placeholder="" maxlength="120" value="@Model.Titulo" /><br />
+    <label>Texto do Anúncio</label><br />
+    <textarea rows="3" id="txt_textAnuncio" class="w-100 mb-2" placeholder="">@Model.Descricao</textarea>
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <label>Escolha o tipo de Desconto:</label><br />
+            <input type="radio" id="rad_desc1" name="rad_desc" class="rad_desc" value="P" checked="checked" /> Preço &nbsp; &nbsp;
+            <input type="radio" id="rad_desc2" name="rad_desc" class="rad_desc" value="C" /> Cupom
+        </div>
+    </div>
+    <div class="row" id="divDescPreco">
+        <div class="col-md-5">
+            <label>Preço Promocional (R$)</label><br />
+            <input type="text" id="txt_prcComPromo" class="w-100 mb-2 money2" placeholder="" value="@Model.PrecoComDesconto" />
+        </div>
+        <div class="col-md-4">
+            <label>Preço sem promoção (R$)</label><br />
+            <input type="text" id="txt_prcSemPromo" class="w-100 mb-2 money2" placeholder="" value="@Model.PrecoNormal" />
+        </div>
+        <div class="col-md-3">
+            <label>Desconto</label><br />
+            <div class="f20r font-weight-bold"><span id="txtDesconto">0</span>% Off</div>
+        </div>
+    </div>
+    <div class="row mb-2" id="divDescCupom" style="display:none;">
+        <div class="col-md-3">
+            <label>Desconto:</label><br />
+            <input type="text" id="txt_desconto" class="w-70 mb-2 money2" maxlength="5" placeholder="" value="@Model.Desconto.Value.ToString("N")" /> % Off
+        </div>
+        <div class="col-md-9">
+            <label>Sobre o desconto:</label><br />
+            <input type="text" id="txt_cupom" class="w-100 mb-2" maxlength="49" placeholder="Ex. em toda loja, em qualquer compra, nas compras acima de R$90,00" value="@Model.DescDesconto" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label>Período da promoção</label><br />
+            <input type="date" id="txt_perIniPromo" class="" value="@Model.DataInicio.Value.ToString("yyyy-MM-dd")" /> a
+            <input type="date" id="txt_perFimPromo" class="" value="@Model.DataFim.Value.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label>Categoria</label><br />
+            <select id="sel_categoria" class="w-100 mb-2">
+                <option value="@Model.CategoriaId">@Model.Categoria.Nome</option>
+                <option value="1">Alimentação</option>
+                <option value="2">Casa e Escritório</option>
+                <option value="3">Educação</option>
+                <option value="4">Entretenimento</option>
+                <option value="5">Esporte</option>
+                <option value="6">Roupas e Acessórios</option>
+                <option value="7">Saúde</option>
+                <option value="8">Tecnologia</option>
+                <option value="9">Transporte</option>
+                <option value="10">Viagem</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Tipo de Anúncio</label><br />
+            <select id="sel_tipoAnuncio" class="w-100 mb-2">
+                <option value="@Model.TipoAnuncio">@Model.TipoAnuncio</option>
+                <option value="Local">Local</option>
+                <option value="Web">Web</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="mb-2 font-weight-bold">Descreva as regras de uso da promoção</div>
+        <textarea rows="3" id="txt_textModoUso" class="w-100 mb-2" maxlength="500" placeholder="">@Model.ModoUso</textarea>
+    </div>
+    <div class="row">
+        <div class="col-md-5 mb-2">
+            <label><strong>Código da Promoção</strong></label><br />
+            <input type="text" id="txt_codPromo" class="w-100 mb-2" maxlength="15" value="@Model.CodigoPromocao" />
+        </div>
+        <div class="col-md-7" id="divlnkpromo">
+            <label>Página ou Email da Promoção</label><br />
+            <input type="text" id="txt_linkPromo" class="w-100 mb-2" maxlength="150" value="@Model.LinkPromocao" />
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-3"><input type="checkbox" id="chk_EndShow" /> Mostrar Endereço</div>
+        <div class="col-md-3"><input type="checkbox" id="chk_TelShow" /> Mostrar Telefone</div>
+        <div class="col-md-3"><input type="checkbox" id="chk_SiteShow" /> Mostrar Site</div>
+        <div class="col-md-3"><input type="checkbox" id="chk_FormShow" /> Form. de Contato (email)</div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <input type="checkbox" id="chk_termo" class="mb-3" value="" checked /> Declaro que estou de acordo com o <a href="#termo">Termo do Site</a>.
+        </div>
+        <div class="col-md-3 text-right">
+            <button id="btn-cadastroPromocao" class="btn laranja f-branca">Atualizar Promoção</button>
+        </div>
+    </div>
+</fieldset>
+

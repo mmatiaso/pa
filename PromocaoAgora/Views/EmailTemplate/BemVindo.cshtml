@@ -1,0 +1,35 @@
+﻿
+@{
+    Layout = null;
+    string actualhost = ViewData["actualhost"].ToString();
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BemVindo</title>
+</head>
+<body>
+    <div style="background-color:#449D44; padding:6px 10px;color:#fff;"> 
+        <span style="font-size:1.6rem">PROMOÇÃO AGORA</span>
+    </div>
+    <div style="padding:10px;">
+        <h2>Seja Bem Vindo, ##NOME##</h2>
+        <p><strong>Obrigado por se cadastrar no Promoção Agora.</strong></p>
+        <p>
+            Para confirmar o seu cadastro, clique no link abaixo:<br/><br/>
+            <strong><a href="@actualhost/site/confirmaemail?email=##EMAIL##"> CONFIRMAR MEU CADASTRO</a></strong>
+        </p>
+        <p>
+            <strong>"Nosso objetivo é aproximar todas as pessoas e empresas que fazem algum serviço ou vendem algum produto dos seus clientes em potencial."</strong>
+        </p>
+    </div>
+    <div>
+        <hr />
+        <p><strong>Promoção Agora</strong><br />
+        Av. Tenente Coronel Muniz e Aragão, 71 - Anil, Jacarepaguá - Rio de Janeiro, RJ - Brasil</p>
+    </div>
+</body>
+</html>

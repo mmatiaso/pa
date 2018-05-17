@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "Fale Conosco - Promoção Agora";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#btnEnvio").click(function () {
+            //alert("enteir");
+            var ems = {
+                Assunto: $("#txt_assunto").val(),
+                Descricao: $("#txt_corpo").val(),
+                Para: "promocaoagoraoficial@gmail.com",
+                From: $("#txt_fromemail").val()
+            }
+
+            var jqxhr = $.ajax({
+                type: "POST",
+                url: "/api/EnviaEmail",
+                data: ems,
+                beforeSend: function () {
+                    //
+                }
+            })
+                .done(function (data) {
+                    alert(data.desc);
+                });
+        });
+    });
+</script>
+
+<div class="mt-2">
+    <a class="" href="/site/">Página Inicial</a> <i class="fa fa-angle-double-right"></i>
+    <strong>Fale Conosco</strong>
+</div>
+<div class="mt-4">
+    <h2 dir="ltr">Fale Conosco</h2>
+    <div class="row">
+        <div class="col-md-8">
+            
+                <label>Assunto:</label><br/>
+                <input type="text" id="txt_assunto" placeholder="Escreva o assunto" class="w-100" /><br/><br />
+                <label>Descrição:</label><br />
+                <textarea id="txt_corpo" rows="5" class="w-100"></textarea>
+                <label>Email:</label><br />
+                <input type="text" id="txt_fromemail" placeholder="Digite seu email" class="w-100" /><br/><br />
+                <button id="btnEnvio" class="btn btn-success">Enviar</button>
+            
+        </div>
+        <div class="col-md-4">
+            <strong>Dica do Atendimento</strong>
+            <p>Olá, tentaremos responder todas as questões, críticas ou comentários. Mas, antes de enviar, verifique se a sua questão já não foi respondida no nosso FAQ.
+            <a href="/site/faq">Acesse o FAQ</a></p>
+        </div>
+    </div>
+</div>
+
