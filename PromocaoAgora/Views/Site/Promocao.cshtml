@@ -2,61 +2,272 @@
 @{
     ViewBag.Title = "Promocao";
 }
+@section Scripts{
+<script type="text/javascript">
+    if (!String.format) {
+        String.format = function (format) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return format.replace(/{(\d+)}/g, function (match, number) {
+                return typeof args[number] != 'undefined'
+                    ? args[number]
+                    : match
+                    ;
+            });
+        };
+    }
+
+    function getUrlLastSlash() {
+        var pathArray = window.location.pathname.split('/');
+        return pathArray[pathArray.length - 1];
+    }
+    //get id from querystring
+    var promoID = getUrlLastSlash();//getUrlParameter('pid');
+    //alert(promoID);
+    var logado = false;
+    //alert(logado);
+    
+    //alert(promoID);
+    //ajax
+    $(document).ready(function () {
+        //get status logged-----------------------------------------
+        var _uid = getCookie("uid");
+        if (getCookie("logged")) {
+            logado = true;
+        }
+        //alert(logado);
+        //var retorno = false;
+        //alert(_uid);
+        //if (_uid != null) {
+        //    //check if exists
+        //    var urlcall = "/api/islogged?uid=" + _uid;
+        //    var jqxhr = $.ajax(urlcall)
+        //        .done(function (data) {
+        //            logado = true;
+        //            //console.log(logado);
+                    
+        //        });
+        //}
+        //else {
+        //    //
+        //}
+        //get promotion data-----------------------------------------------
+        var urlservice = "/api/Promocaos/" + promoID;
+        var jqxhr = $.ajax(urlservice)
+            .done(function (data) {
+                //console.log(data);
+                //alert(data.PromoCards[0].Distancia);
+                $("title").text(data.Titulo);
+                $("#aTitulo").text(data.Titulo + " - " + formataPorcentagem(data.Desconto) + " Off");
+                $("#aDescricao").html(data.Descricao);
+                //$("#aPrecoDesconto").text(formataDinheiro(data.PrecoComDesconto));
+                //$("#aPrecoNormal").text(formataDinheiro(data.PrecoNormal));
+                td = data.TipoDesconto.trim();
+                //alert(td);
+                var descprec = "";
+                if (td == "P") {
+                    descprec = String.format("Preço: <span class='f20r f-verde font-weight-bold'>{0}</span> <span id='aPrecoNormal' class='rabiscado f12r'>({1})</span>", formataDinheiro(data.PrecoComDesconto), formataDinheiro(data.PrecoNormal));
+                } else if (td == "C") {
+                    descprec = String.format("Desconto: <span class='f20r f-verde font-weight-bold'>{0}</span> <span id='descdesc' class='f-verde f10r'> ({1})</span>", formataPorcentagem(data.Desconto), data.DescDesconto);
+                }
+                $("#descprice").html(descprec);
+                $("#aEmpresa").text(data.Empresa.Nome);
+                
+                var end = data.Empresa.UF + " - " + data.Empresa.Cidade + " - " + data.Empresa.Bairro + "<br\>" + data.Empresa.Logradouro + ", " + data.Empresa.Numero;
+                if (data.Empresa.Complemento != null) {
+                    end += " - " + data.Empresa.Complemento;
+                }
+                if (data.TipoAnuncio == "Web") {
+                    $("#linkPromocao").attr("href", data.LinkPromocao);
+                    $("#linkPromocao").text(data.LinkPromocao);
+                    $("#divlnkpromo").show();    
+                }
+                if (data.Empresa.Site != null && data.MostraSite) {
+                    $("#divSite").show();
+                    $("#aSite").text(data.Empresa.Site);
+                } else {
+                    $("#divSite").hide();
+                }
+                if (!data.MostraEndereco) {
+                    $("#divLocal").hide();
+                }
+                if (!data.MostraTelefone) {
+                    $("#divTels").hide();
+                }
+                $("#aLocal").html(end);
+
+                $("#googlelink").attr("href", "https://www.google.com.br/maps/" + '@@' + data.Empresa.Latitude + "," + data.Empresa.Longitude + ",15z");
+
+                //tels
+                var clicktel1 = "tel:" + data.Empresa.Telefone;
+                var clicktel2 = "tel:" + data.Empresa.Celular;
+                if (data.Empresa.Telefone != null && data.Empresa.Telefone != "") {
+                    $("#aTel1").text(data.Empresa.Telefone);
+                    $("#aTel1").attr("href", clicktel1);
+                    $("#aTel1").show();
+                }
+                if (data.Empresa.Celular != null && data.Empresa.Celular != "") {
+                    $("#aTel2").text(data.Empresa.Celular);
+                    $("#aTel2").attr("href", clicktel2);
+                    $("#aTel2").show();
+                }
+                //modouso
+                //var mduso = "<li>Cadastre-se para desbloquear o código ou o link de promoção</li>";
+                //if (data.ModoUso != null) {
+                //    if (data.ModoUso.includes("nolocal")) {
+                //        mduso += "<li>Apresente o código da promoção para o vendedor ou a pessoa que vier lhe atender.</li>"
+                //    }
+                //    if (data.ModoUso.includes("notelefone")) {
+                //        mduso += "<li>Ao ligar e solicitar o produto ou serviço, mencione o Código de Promoção.</li>"
+                //    }
+                //    if (data.ModoUso.includes("nosite")) {
+                //        mduso += "<li>Acesse o link da promoção e compre mais em conta.</li>"
+                //    }
+                //    if (data.ModoUso.includes("noemail")) {
+                //        mduso += "<li>Ao solicitar o produto ou serviço por email, mencione o Código de Promoção.</li>"
+                //    }
+                //}
+                $("#mododeuso").html(data.ModoUso);
+                $("#bc").html(data.Empresa.Nome + " <i class='fa fa-angle-double-right'></i> <b>" + data.Titulo + "</b>");
+
+                //show codigo de promocao
+                if (logado) {
+                    //alert("ddd");
+                    $("#codpromo").html("<strong>" + data.CodigoPromocao.toUpperCase() + "</strong>");
+                    //alert('oi');
+                }
+
+                var linkstat = String.format("/home/stat?p={0}&imp={1}&vp={2}&vc={3}", promoID, false, true, logado);
+                $("#stat").attr("src", linkstat);
+
+            })
+            .fail(function () {
+                alert(errorThrown + textStatus);
+            })
+            .always(function () {
+                //alert("complete");
+
+            });
+
+        
+        //click para desbloquear codigo promocao
+        $("#clickPromocao").click(function () {
+            //alert("oi");
+            $('#myModal').modal('show');
+            $(".modal-title").text("Cadastre-se para desbloquear");
+            //$('.modal-body').text("ola testando");
+            $(".modal-body").load("/site/CriaUsuario?redirecturl=" + location.href);
+        });
+    });
+    
+</script>
+    }
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-faded f-branca">
+                <h5 class="modal-title" id="exampleModalLabel">Dados da Promoção</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            
+        </div>
+    </div>
+</div>
 
 <div class="">
     <div class="mt-2">
-        <a class="" href="/site/">Página Inicial</a> /
-        <span class="">Xpto Soluções</span>
+        <a class="" href="javascript:history.back(-1);"><i class="fa fa-angle-double-left"></i> Voltar</a> |
+        <span id="bc" class=""></span>
     </div>
     <div class="mt-2 mt-md-4">
-        <h2>Thermas de Olímpia Resort/SP: até 7 noites para 2 adultos e Cortesia para até 3 Crianças de até 12 anos em até 12x. Alta Temporada 2018! - 30% Off</h2>
-        <div class="row mt-2 mt-md-5">
-            <div class="col-md-9">
+        <h2 id="aTitulo" class="f-verde font-weight-bold"><span id="aDesconto"></span></h2>
+        <div class="row mt-2 mt-md-4">
+            <div class="col-md-10">
                 <div class="row">
-                    <div class="col-md-auto hidden-md-down">
+                    @*<div class="col-md-auto hidden-md-down">
                         <img class="imgw80" src="~/Content/img/alimentacao.jpg" alt="">
-                    </div>
-                    <div class="col-md-10">
-                        <div class="hidden-md-up"><a href="#sobre">Sobre a Promoção</a> | <a href="#como">Como Usar?</a></div>
-                        <span class="font-weight-bold"><a name="sobre">Sobre a promoção:</a></span><br/>
-                        <span>
-                            Amphitrite cingebant inter super pontus pinus zonae ipsa cepit vindice innabilis nuper membra formaeque fluminaque congeriem fossae premuntur cingebant securae piscibus rectumque quinta recepta nullo meis vindice occiduo matutinis campos modo ventos ut rectumque glomeravit zonae fratrum dicere coeperunt corpora frigore discordia aetas aberant iussit formaeque aberant mundo pulsant egens litora bene dextra lucis ligavit: flamma locavit tanto nubibus ut fuit ensis proxima induit ante vindice est videre tumescere natura astra ambitae mundi calidis undis emicuit minantia adsiduis ab fontes locoque umor caelo vis in quanto melior tumescere aestu imagine aetas deducite concordi lege quam quae omnia suis volucres solum fabricator aeris.
-                        </span>
-                        <div class="row mt-md-2">
-                            <div class="col-md py-2">
-                                Preço: <span class=" f20r f-verde">R$ 499,99</span>
+                    </div>*@
+                    <div class="col-md-12">
+                        <div class="hidden-md-up my-2"><a href="#sobre">Sobre a Promoção</a> | <a href="#como">Confira as Regras</a></div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="">
+                                    <span class="font-weight-bold"><a name="sobre">Sobre a promoção</a></span><br />
+                                    <span id="aDescricao">
+                                    </span>
+                                    <div class="py-2">
+                                        <div id="descprice"></div>
+                                    </div>
+                                </div>
+                               
                             </div>
                             <div class="col-md">
-                                <div class="box1 text-center">
-                                   <span>Código da Promoção:</span> <br/>
-                                    <span><a href="#">Cadastre-se para desbloquar o código</a></span>
+                                <div class="reg py-2">
+                                    <div class="box1 text-center">
+                                        <span>Código da Promoção:</span> <br />
+                                        <div id="codpromo"><a href="#" id="clickPromocao">Cadastre-se para desbloquear o código</a></div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a name="como"><strong>Regras da Promoção</strong></a>
+                                        <div id="mododeuso">
+                                        </div>
+                                    </div>
+
+                                    
                                 </div>
+
                             </div>
                         </div>
+                        <div class="">
+                            <div id="divlnkpromo" style="display:none;" class="py-2">
+                                <span><strong>Página ou Email da Promoção:</strong></span> <br />
+                                <a href="#" id="linkPromocao" class="btn btn-primary active my-1" role="button" target="_blank"></a>
+                            </div>
+                            <div class="py-2">
+                                <span class="font-weight-bold">Empresa:</span><br />
+                                <span id="aEmpresa"></span>
+                            </div>
 
-                        <div class="py-2">
-                            <strong>Empresa:</strong><br />
-                            <span>Xpto Soluções</span>
+                            <div class="py-2" id="divLocal">
+                                <span class="font-weight-bold">Local:</span><br />
+                                <span id="aLocal">Av. Lúcio Costa, 7000 - Barra da Tijuca - Rio de Janeiro, RJ</span><br />
+                                <a href="https://www.google.com.br/maps/-22.9503488,-43.343949,15z" target="_blank" id="googlelink">Ver mapa (Google Maps)</a>
+                            </div>
+
+                            <div class="py-2" id="divTels">
+                                <span class="font-weight-bold">Telefone(s):</span><br />
+                                <a href="" id="aTel1" class="btn btn-primary active my-1" role="button" style="display:none;"></a><br />
+                                <a href="" id="aTel2" class="btn btn-primary active my-1" role="button" style="display:none;"></a>
+                            </div>
+
+                            <div class="py-2" id="divSite">
+                                <span class="font-weight-bold">Site:</span><br />
+                                <span id="aSite">Site não cadastrado</span>
+                            </div>
                         </div>
+                        
+                       
+                        
+                        
 
-                        <div class="py-2">
-                            <strong>Local:</strong><br />
-                            <span>Av. Lúcio Costa, 7000 - Barra da Tijuca - Rio de Janeiro, RJ</span><br/>
-                            <a href="https://www.google.com.br/maps/-22.9503488,-43.343949,15z">Ver mapa (Google Maps)</a>
-                        </div>https://www.google.com.br/maps/place/Av.+L%C3%BAcio+Costa,+7000+-+Barra+da+Tijuca,+Rio+de+Janeiro+-+RJ,+22795-006/@-23.0108446,-43.3716252,17z/data=!3m1!4b1!4m5!3m4!1s0x9bdbab201d8a81:0xc9563ee7bec1bdf1!8m2!3d-23.0108446!4d-43.3694365
+
+
+                        
 
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <a name="como"><h4>Como Usar:</h4></a>
-                    <ol>
-                        <li>Cadastre-se para desbloquear o código de promoção</li>
-                        <li>Apresente o código da promoção para o vendedor ou a pessoa que vier lhe atender.</li>
-                    </ol>
-</div>
+            <div class="col-md-2">
+            </div>
         </div>
 
         
     </div>
 </div>
+<img id="stat" src="" width="0" height="0" />

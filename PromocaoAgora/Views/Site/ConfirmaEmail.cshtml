@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "Confirmação do Email";
+}
+<div class="container">
+    <div class="jumbotron">
+        <h1>Confirmação do Email</h1>
+        <p>
+            @Html.Raw(ViewData["mens"])
+        </p>
+        <p><a href="/site/login?redirecturl=@ViewData["redir"]">FAÇA O LOGIN</a></p>
+    </div>
+    
+</div>
+
+
+

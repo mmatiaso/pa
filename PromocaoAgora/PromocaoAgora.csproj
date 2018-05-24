@@ -46,13 +46,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.7\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Device" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.6132.35681, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.7\lib\net40\System.Linq.Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -177,24 +188,97 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\CRMController.cs" />
+    <Compile Include="Controllers\EmailTemplateController.cs" />
+    <Compile Include="Controllers\EmpresasController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PromocaosController.cs" />
     <Compile Include="Controllers\SiteController.cs" />
+    <Compile Include="Controllers\UsuariosController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Campanha.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Categoria.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Empresa.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Framework.cs" />
+    <Compile Include="Models\Modelos.cs" />
+    <Compile Include="Models\promoagora.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>promoagora.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\promoagora.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\promoagora.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>promoagora.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Promocao.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Suporte.cs" />
+    <Compile Include="Models\sysdiagram.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuario.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuarioEmpresa.cs">
+      <DependentUpon>promoagora.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="CadastroPromocao.html" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Components\EditorLineControl\editor.css" />
+    <Content Include="Content\Components\EditorLineControl\editor.js" />
+    <Content Include="Content\email.css" />
+    <Content Include="Content\img\addtohomeAndroid1.png" />
+    <Content Include="Content\img\addtohomeAndroid2.png" />
+    <Content Include="Content\img\addtohomeAndroid3.png" />
     <Content Include="Content\img\alimentacao.jpg" />
+    <Content Include="Content\img\check_bgescuro.PNG" />
+    <Content Include="Content\img\check_bgescuro2.png" />
+    <Content Include="Content\img\fundo_alimentacao.jpg" />
+    <Content Include="Content\img\icon-logo.png" />
     <Content Include="Content\img\local_icon.png" />
+    <Content Include="Content\img\logo-fundoverde.jpeg" />
+    <Content Include="Content\img\logo-fundoverde.png" />
+    <Content Include="Content\img\logo-invertido.png" />
+    <Content Include="Content\img\logo-original.png" />
+    <Content Include="Content\img\mobile-site.png" />
+    <Content Include="Content\img\mobile_site.PNG" />
     <Content Include="Content\img\viagem_icon64.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="icone192x192.png" />
+    <Content Include="manifest.js" />
+    <Content Include="Models\promoagora.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>promoagora.edmx</DependentUpon>
+      <LastGenOutput>promoagora.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\promoagora.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>promoagora.edmx</DependentUpon>
+      <LastGenOutput>promoagora.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -219,13 +303,29 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EntityDeploy Include="Models\promoagora.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>promoagora.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\promoagora.edmx.diagram">
+      <DependentUpon>promoagora.edmx</DependentUpon>
+    </Content>
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\jquery.mask.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Scripts\site.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Site\CadastroPromocao.html" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -238,14 +338,36 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Site\Index.cshtml" />
     <Content Include="Views\Site\Promocao.cshtml" />
     <Content Include="Views\Site\CadastroCliente.cshtml" />
+    <Content Include="Views\Site\AreaCliente.cshtml" />
+    <Content Include="Views\Shared\simples.cshtml" />
+    <Content Include="Views\Site\Login.cshtml" />
+    <Content Include="Views\Site\CadastroPromocao.cshtml" />
+    <Content Include="Views\Site\EditaPromocao.cshtml" />
+    <Content Include="Views\Site\EditaEmpresa.cshtml" />
+    <Content Include="Views\Site\ConfirmaEmail.cshtml" />
+    <Content Include="Views\Site\Termos.cshtml" />
+    <Content Include="Views\Site\PoliticaPrivacidade.cshtml" />
+    <Content Include="Views\Site\EditaUsuario.cshtml" />
+    <Content Include="Views\Site\CriaUsuario.cshtml" />
+    <Content Include="Views\EmailTemplate\BemVindo.cshtml" />
+    <Content Include="Views\Site\QuemSomos.cshtml" />
+    <Content Include="Views\Site\FaleConosco.cshtml" />
+    <Content Include="Views\Site\FAQ.cshtml" />
+    <Content Include="Views\Home\Stat.cshtml" />
+    <Content Include="Views\EmailTemplate\EmktBasico.cshtml" />
+    <Content Include="Views\EmailTemplate\EnviaEmail.cshtml" />
+    <Content Include="Views\Site\AdicionarTelaInicial.cshtml" />
+    <Content Include="Views\CRM\usuarios.cshtml" />
+    <Content Include="Views\CRM\Index.cshtml" />
+    <Content Include="Views\CRM\Mailing.cshtml" />
+    <Content Include="Views\CRM\Campaign.cshtml" />
+    <Content Include="Views\Site\Inicial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -259,6 +381,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

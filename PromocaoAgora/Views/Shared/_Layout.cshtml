@@ -1,36 +1,118 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
+    <meta name="keywords" content="promoção, promocao, promoções perto de mim, promocao bairro, melhores promoções, oferta, ofertas perto de mim, desconto, melhores ofertas, melhores descontos, anunciar minha empresa, anuncio, divulgação, divulgar empresa" />
+    <meta name="description" content="O Promoção Agora é um site de promoções, que exibe as promoções mais próximas de onde você está. Nosso objetivo é aproximar todas as pessoas e empresas que fazem algum serviço ou vendem algum produto dos seus clientes em potencial." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="shortcut icon" href="/icone192x192.png" type="image/ico" />
+    @*<link rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-icon-114x114.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="/images/apple-icon-144x144.png" />*@
+    <link rel="canonical" href="https://www.promocaoagora.com.br" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="PROMOÇÃO AGORA - PROMOÇÕES PERTO DE VOCÊ" />
+    <meta property="og:description" content="O Promoção Agora é um site de promoções, que exibe as promoções mais próximas de onde você está. Nosso objetivo é aproximar todas as pessoas e empresas que fazem algum serviço ou vendem algum produto dos seus clientes em potencial." />
+    <meta property="og:url" content="https://www.promocaoagora.com.br/site/" />
+    <meta property="og:site_name" content="Promoção Agora" />
+    <meta property="website:publisher" content="https://www.facebook.com/promocaoagorasite/" />
+    <meta property="website:tag" content="promocao perto" />
+    <meta property="website:tag" content="ofertas perto" />
+    <meta property="website:tag" content="promocoes restaurante" />
+    <meta property="website:tag" content="melhores promocoes" />
+    <meta property="website:tag" content="melhores ofertas" />
+
+
     @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
+    <script type="text/javascript" src="~/Scripts/site.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+    <script src="https://use.fontawesome.com/5b8e63c5df.js"></script>
+    @*<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>*@
+    @RenderSection("header", required: false)
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".navbar-brand").click(function () {
+                location = "/";
+            })
+            var logged = getCookie("logged");
+            if (logged) {
+                var logtext = "Olá " + getCookie("loggedName") + ", <a href='/site/areacliente' class='f-branca'>Área do Cliente</a> | <a href='/site/logout' class='f-branca'>Sair</a>";
+                $("#loginarea").html(logtext);
+                //mobile part
+                $("#moblogin").text("Sair");
+                $("#moblogin").attr("href", "/site/logout");
+                $("#mobAreaCliente").show();
+                $("#loggedmob").show();
+                $("#novaPromo").attr("href", "/site/areacliente");
+            }
+            else {
+                $("#loggedmob").hide();
+            }
+
+        });
+    </script>
     <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCKSYavWd6TxWDIKyaie9rfl45MGDmL1Fk&ver=3.exp"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116045198-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-116045198-1');
+    </script>
+
 </head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <body>
+    <a id="inicio"></a>
     <nav class="navbar navbar-toggleable-md navbar-inverse navbar-light bg-faded">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         @*<div class="container" href="#">Promoção Agora</div>*@
-        <div class="navbar-brand ml-lg-6">Promoção Agora</div>
-        <div class="collapse navbar-collapse flex-row-reverse mr-5" id="navbarNavAltMarkup">
-            <div class="navbar-nav hidden-md-up">
-                <a class="nav-item nav-link active" href="#">Página Inicial <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="#">Login</a>
-                <a class="nav-item nav-link" href="#">Alimentação</a>
-                <a class="nav-item nav-link" href="#">Educação</a>
-                <a class="nav-item nav-link" href="#">Saúde</a>
-                <a class="nav-item nav-link" href="#">Entretenimento</a>
-                <a class="nav-item nav-link" href="#">Esporte</a>
-                @*<a class="nav-item nav-link disabled" href="#">Saúde</a>*@
-            </div> 
-            <div class="hidden-md-down mr-lg-6">
-                <a class="nav-item nav-link active" href="#">Login</a>
+        <div class="container">
+            <div class="navbar-brand"><img src="~/Content/img/logo-fundoverde.jpeg" alt="Promoção Agora" id="logo" /> @*Promoção Agora*@</div>
+            @*<div class="hidden-md-down f8r">Sua busca a poucos metros de distância.</div>*@
+            <div id="loggedmob" class="hidden-md-up f-branca">
+                <a class="f-branca btn btn-success" href="/site/areacliente"><i class="fa fa-user"></i></a>
+            </div>
+            <div class="collapse navbar-collapse flex-row-reverse mr-5" id="navbarNavAltMarkup">
+                <div class="navbar-nav hidden-md-up">
+                    <a class="nav-item nav-link active" href="#">Página Inicial <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link" id="mobAreaCliente" href="/site/areacliente" style="display:none;">Área do Cliente</a>
+                    
+                    <a class="nav-item nav-link" href="/site/cadastrocliente">Crie uma Promoção (grátis)</a>
+                    <a class="nav-item nav-link" href="/site/quemsomos">Quem Somos</a>
+                    <a class="nav-item nav-link" href="/site/faq">Perguntas Frequentes</a>
+                    <a class="nav-item nav-link" href="/site/faleconosco">Fale Conosco</a>
+                    <a class="nav-item nav-link" href="/site/politicaprivacidade">Política de Privacidade</a>
+                    <a class="nav-item nav-link" href="/site/termo">Termo do site</a>
+                    <a class="nav-item nav-link" id="moblogin" href="/site/login">Login</a>
+                    @*<a class="nav-item nav-link" href="#">Alimentação</a>
+                    <a class="nav-item nav-link" href="#">Educação</a>
+                    <a class="nav-item nav-link" href="#">Saúde</a>
+                    <a class="nav-item nav-link" href="#">Entretenimento</a>
+                    <a class="nav-item nav-link" href="#">Esporte</a>*@
+                    @*<a class="nav-item nav-link disabled" href="#">Saúde</a>*@
+                </div>
+                
+                <div id="loginarea" class="hidden-md-down mr-lg-6 f-branca">
+                    <a class="f-branca" href="/site/login">Login</a>
+                </div>
+                <a id="novaPromo" class="btn btn-sm btn-secondary mr-5 hidden-md-down" href="/site/cadastrocliente" role="button">Cadastrar Promoção (grátis)</a>
+                @*<button type="button" class="btn btn-sm btn-secondary mr-5 hidden-md-down">Cadastrar Promoção</button>*@
             </div>
         </div>
     </nav>
@@ -38,13 +120,32 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Meu Aplicativo ASP.NET</p>
-            @*<div>Icons made by <a href="https://www.flaticon.com/authors/linh-pham" title="Linh Pham">Linh Pham</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>*@
+            <div class="row">
+                <div class="col-md-4">
+                    <a class="" href="/site/quemsomos">Quem Somos</a><br />
+                    <a class="" href="/site/cadastrocliente">Cadastre-se</a><br />
+                    <a class="" href="/site/login">Login</a>
+                </div>
+                <div class="col-md-4">
+                    <a class="" href="/site/cadastrocliente">Crie uma Promoção (grátis)</a><br />
+                    <a class="" href="/site/faq">Perguntas Frequentes</a><br/>
+                    <a class="" href="/site/faleconosco">Fale Conosco</a>
+                </div>
+                <div class="col-md-4">
+                    
+                    <a class="" href="/site/politicaprivacidade">Política de Privacidade</a><br />
+                    <a class="" href="/site/termo">Termo do site</a>
+                </div>
+            </div>
+            <div style="background-color:#f5f5f5; padding:2px 4px; font-size:11px; margin-top:15px; color:#808080">
+                &copy; @DateTime.Now.Year - Promoção Agora
+            </div>
+           
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    
     @RenderSection("scripts", required: false)
+    
 </body>
 </html>

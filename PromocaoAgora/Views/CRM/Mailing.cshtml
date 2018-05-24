@@ -1,0 +1,190 @@
+﻿
+@{
+    ViewBag.Title = "Mailing";
+}
+@section header{
+    <meta name="robots" content="noindex, nofollow">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //Ufs select fill
+            //alert("oi");
+            $.get("/api/UFUsuarios")
+                .done(function (data) {
+                    selectuf = $("#sel_uf");
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        $('<option>').val(data[i]).text(data[i]).appendTo(selectuf);
+                    }
+                    
+                });
+
+            //Cidades select fill
+            $("#sel_uf").change(function () {
+                
+                var urlcid = "/api/CidadeUsuarios?_uf=" + $("#sel_uf").val();
+                
+                $("#q").val();
+                $.get(urlcid)
+                    .done(function (data) {
+                        selectcid = $("#sel_cid");
+                        selectcid.find('option').remove();
+                        selectbai = $("#sel_bai");
+                        selectbai.find('option').remove();
+                        $('<option>').val("").text("Selecione").appendTo(selectcid);
+                        $('<option>').val("").text("Selecione").appendTo(selectbai);
+                        for (i = 0; i < data.length; i++) {
+                            $('<option>').val(data[i]).text(data[i]).appendTo(selectcid);
+                        }
+                        Contar();
+                    });
+                
+            });
+
+            //Bairros select fill
+            $("#sel_cid").change(function () {
+                var urlcid = "/api/BairroUsuarios?_cid=" + $("#sel_cid").val();
+
+                $.get(urlcid)
+                    .done(function (data) {
+                        selectbai = $("#sel_bai");
+                        selectbai.find('option').remove();
+                        $('<option>').val("").text("Selecione").appendTo(selectbai);
+                        for (i = 0; i < data.length; i++) {
+                            $('<option>').val(data[i]).text(data[i]).appendTo(selectbai);
+                        }
+                        Contar();
+                    });
+                
+            });
+
+            //select Bairro
+            $("#sel_bai").change(function () {
+                Contar();
+            });
+
+            //select stat
+            $("#sel_stat").change(function () {
+                Contar();
+            });
+
+            //Count
+            function Contar() {
+                var _uf = $("#sel_uf").val();
+                var _cid = $("#sel_cid").val();
+                var _bai = $("#sel_bai").val();
+                var _stat = $("#sel_stat").val();
+                var urlq = "/api/CountUsuarios?_UF=" + _uf;
+                
+                if (_cid != "" && _cid != null) {
+                    urlq += "&_cid=" + _cid;
+                }
+                if (_bai != "" && _bai != null) {
+                    urlq += "&_bai=" + _bai;
+                }
+                if (_stat != "" && _stat != null) {
+                    urlq += "&_status=" + _stat;
+                }
+                //alert(urlq);
+                $.get(urlq)
+                    .done(function (data) {
+                        $("#totUsu").text(data);
+
+                    });
+            }
+
+            //template iframe
+            $("#txt_templateUrl").change(function () {
+                var turl = "/emailtemplate/" + $("#txt_templateUrl").val();
+                $("#iframeeml").attr("src", turl);
+            });
+
+            //Send Email
+            $("#btnSend").click(function () {
+                var sr = {
+                    status: $("#sel_stat").val(),
+                    ativo: null,
+                    UF: $("#sel_uf").val(),
+                    cid: $("#sel_cid").val(),
+                    bai: $("#sel_bai").val(),
+                    assunto: $("#txt_assunto").val(),
+                    template: $("#txt_templateUrl").val(),
+                    campanha: $("#txt_campanha").val()
+                }
+                $.post("/api/SendEmailUsuarios", sr)
+                    .done(function (data) {
+                        $("#eml-enviados").text(data);
+
+                    });
+            });
+        });
+    </script>
+}
+<div class="mt-2">
+    <a class="" href="/site/">Página Inicial</a> <i class="fa fa-angle-double-right"></i>
+    <a class="" href="/crm/">CRM</a> <i class="fa fa-angle-double-right"></i> <strong>Mailing</strong>
+</div>
+<h2 class="my-3">Mailing</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="my-2">
+            <strong>Dados da Campanha</strong>
+            <input type="text" id="txt_campanha" maxlength="50" placeholder="Nome da Campanha" class="w-100" />
+        </div>
+        <div class="my-2"><strong>Filtros</strong></div>
+        <div class="my-2">
+            <div class="box2">
+                <h4><span id="totUsu">0</span> Usuários</h4>
+            </div>
+        </div>
+        <div class="my-2">
+            <label class="w-25">UF:</label>
+            <select id="sel_uf" class="w-50">
+                <option value="">Selecione</option>
+            </select>
+        </div>
+        <div class="my-2">
+            <label class="w-25">Cidade:</label>
+            <select id="sel_cid" class="w-50">
+                <option value="">Selecione</option>
+            </select>
+        </div>
+        <div class="my-2">
+            <label class="w-25">Bairro:</label>
+            <select id="sel_bai" class="w-50">
+                <option value="">Selecione</option>
+            </select>
+        </div>
+        <div class="my-2">
+            <label class="w-25">Status:</label>
+            <select id="sel_stat" class="w-50">
+                <option value="">Selecione</option>
+                <option value="TESTE">TESTE</option>
+                <option value="LEAD">LEAD</option>
+                <option value="USUARIO">USUARIO</option>
+                <option value="CLIENTE">CLIENTE</option>
+            </select>
+            @*<input type="text" id="q" />*@
+        </div>
+        <hr />
+        <div class="my-2">
+            <button type="button" id="btnSendTest" class="btn btn-primary w-25">Testar</button>
+            <button type="button" id="btnSend" class="btn btn-success w-25">Enviar</button>
+        </div>
+        <div class="my-2">
+           <p id="eml-enviados"></p>
+        </div>d
+    </div>
+        <div class="col-md-8">
+            <div class="my-2">
+                <strong>Assunto</strong>
+                <input type="text" id="txt_assunto" maxlength="50" placeholder="Digite o título do email" class="w-100" />
+            </div>
+            <div class="my-2">
+                <strong>Template</strong>
+                <input type="text" id="txt_templateUrl" maxlength="50" placeholder="Digite a URL do template" class="w-100" value="EMKTBASICO" />
+            </div>
+            <div class="box2 mt-2">
+                <iframe id="iframeeml" src="/EmailTemplate/emktbasico" width="100%" height="800px" frameborder="0" scrolling="auto" />
+            </div>
+        </div>
+    </div>

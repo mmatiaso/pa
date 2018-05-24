@@ -1,0 +1,88 @@
+﻿<link href="/Content/bootstrap.css" rel="stylesheet">
+<link href="/Content/site.css" rel="stylesheet">
+
+<script src="/Scripts/modernizr-2.6.2.js"></script>
+
+<script src="/Scripts/jquery-1.10.2.js"></script>
+
+<script src="/Scripts/bootstrap.js"></script>
+<script src="/Scripts/respond.js"></script>
+
+<script src="/Scripts/site.js"></script>
+<script type="text/javascript">
+    $("#txt_titAnunciocard").val("DDD");
+    alert(getUrlParameter("pid"));
+</script>
+
+
+<fieldset id="FdcadastroPromocao">
+    <label>Título do Anúncio</label><br />
+    <input type="text" id="txt_titAnuncio" class="w-100 mb-2" placeholder="" /><br />
+    <label>Texto do Anúncio</label><br />
+    <textarea rows="3" id="txt_textAnuncio" class="w-100 mb-2" placeholder=""></textarea>
+    <div class="row">
+        <div class="col-md-5">
+            <label>Preço com promoção (R$)</label><br />
+            <input type="text" id="txt_prcComPromo" class="w-100 mb-2 money2" placeholder="" />
+        </div>
+        <div class="col-md-4">
+            <label>Preço sem promoção (R$)</label><br />
+            <input type="text" id="txt_prcSemPromo" class="w-100 mb-2 money2" placeholder="" />
+        </div>
+        <div class="col-md-3">
+            <label>Desconto</label><br />
+            <div class="f20r font-weight-bold"><span id="txtDesconto">0</span>% Off</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 mb-2">
+            <label>Período da promoção</label><br />
+            <input type="date" id="txt_perIniPromo" class="" /> a
+            <input type="date" id="txt_perFimPromo" class="" />
+        </div>
+        <div class="col-md-4">
+            <label>Categoria</label><br />
+            <select id="sel_categoria" class="w-100 mb-2">
+                <option value="A">Alimentação</option>
+                <option value="C">Casa e Escritório</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Tipo de Anúncio</label><br />
+            <select id="sel_tipoAnuncio" class="w-100 mb-2">
+                <option value="L">Anúncio Local</option>
+                <option value="W">Anúncio Web</option>
+                <option value="LW">Anúncio Local e Web</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="mb-2 font-weight-bold">Como o Cliente usará o Código de Promoção?</div>
+        <input type="checkbox" id="chk_nolocal" name="chk_comoCodPromo" class="nolocal" value="nolocal" /> <strong>No Local:</strong> <span class="f9r"> O Cliente deve apresentar o Código da Promoção no ato da compra ao vendedor/atendente do estabelecimento.</span> <br />
+        <input type="checkbox" id="chk_notelefone" name="chk_comoCodPromo" class="notelefone" value="x" /> <strong>No Telefone:</strong> <span class="f9r">O Cliente ao solicitar o produto/serviço pelo telefone, deve mencionar o Código de Promoção. </span><br />
+        <input type="checkbox" id="chk_nosite" name="chk_comoCodPromo" class="nosite" value="nosite" /> <strong>No Site:</strong> <span class="f9r"> O Cliente deverá clicar no link da promoção e vir até a página de compra.</span><br />
+        <input type="checkbox" id="chk_noemail" name="chk_comoCodPromo" class="noemail" value="x" /> <strong>No Email:</strong> <span class="f9r">  O Cliente deve enviar o email com o pedido e o Código de Promoção.</span><br />
+    </div>
+    <div class="row">
+        <div class="col-md-5 mb-2">
+            <label><strong>Código da Promoção</strong></label><br />
+            <input type="text" id="txt_codPromo" class="w-100 mb-2" />
+        </div>
+        <div class="col-md-7">
+            <label>Link da Promoção</label><br />
+            <input type="text" id="txt_linkPromo" class="w-100 mb-2" disabled />
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <input type="checkbox" id="chk_termo" class="mb-3" value="" /> Declaro que estou de acordo com o <a href="#termo">Termo do Site</a>.
+        </div>
+        <div class="col-md-3 text-right">
+            <button id="btn-cadastroUsuario" class="btn laranja f-branca">Criar Promoção</button>
+        </div>
+    </div>
+</fieldset>
+
+
+

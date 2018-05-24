@@ -2,40 +2,420 @@
 @{
     ViewBag.Title = "CadastroCliente";
 }
+<style type="text/css">
+
+    .Editor-container {
+        margin-top: 0px !important;
+    }
+
+    .Editor-editor {
+        height: 100px !important;
+    }
+    #menuBarDiv {
+        padding: 0px !important;
+    }
+    #menuBarDiv .fa {
+        font-size:0.8rem !important;
+    }
+</style>
+@section scripts{
+<script src="~/Scripts/jquery.mask.min.js"></script>
+<link href="~/Content/Components/EditorLineControl/editor.css" rel="stylesheet" />
+<script src="~/Content/Components/EditorLineControl/editor.js"></script>
+<script type="text/javascript">
+
+    function calcdesc() {
+        var sempromo = $("#txt_prcSemPromo").val();
+        sempromo = sempromo.replace('.', '');
+        sempromo = sempromo.replace(',', '.');
+        var compromo = $("#txt_prcComPromo").val();
+        compromo = compromo.replace('.', '');
+        compromo = compromo.replace(',', '.');
+        //tratando
+        var desc = 100 - ((compromo / sempromo) * 100);
+        
+        //console.log("DESC: " + desc);
+        if (compromo != '' && sempromo != '') {
+            if (desc > 100) {
+                alert("Atenção: O preço promocional deve ser menor que o preço sem desconto.");
+                $("#txt_prcComPromo").val('');
+            } else {
+                desc = desc.toFixed(2);
+                desc = desc.replace('.', ',');
+                $("#txtDesconto").text(desc);
+            }  
+        }
+        else {
+            $("#txtDesconto").text('0');
+        }
+        
+
+    }
+    
+    $(document).ready(function () {
+        var editor = $("#txt_textAnuncio").Editor();
+        var editor2 = $("#txt_textModoUso").Editor();
+        var editorEmpDesc = $("#txt_descricaoEmpresa").Editor();
+
+        if (getCookie('logged')) {
+            $("#sectionUsuario").hide();
+            $("#sectionEmpresa").show();
+            
+            $("#etapa").text("Etapa 2");
+        }
+        if (getCookie('eid') != null && getCookie('eid') != "") {
+            $("#sectionEmpresa").hide();
+            $("#sectionPromocao").show();
+            $("#etapa").text("Etapa 3");
+        }
+        
+
+        $(".phone_with_ddd").mask('(00) 00000-0000');
+        $('.cep').mask('00000-000');
+        $('.cpf').mask('000.000.000-00', { reverse: true });
+        $('.cnpj').mask('00.000.000/0000-00', { reverse: true });
+        $('.money').mask('000.000.000.000.000,00', { reverse: true });
+        $('.money2').mask("#.##0,00", { reverse: true });
+
+        $("#txt_prcSemPromo").focusout(function () {
+            calcdesc();
+        });
+        $("#txt_prcComPromo").focusout(function () {
+            calcdesc();
+        });
+
+        $("#sel_tipoAnuncio").change(function () {
+            if ($("#sel_tipoAnuncio").val() == "Web") {
+                //alert("ok");
+                $("#divlnkpromo").show();
+            }
+            else {
+                //alert("hide");
+                $("#divlnkpromo").hide();
+            }
+        });
+
+        
+
+        //$("#chk_nosite").click(function () {
+        //    //console.log($("#chk_nosite").val());
+        //    if ($("#chk_nosite").val() == "nosite") {
+        //        //console.log('oi');
+        //        $("#txt_linkPromo").removeAttr('disabled');
+        //    }
+        //    else {
+        //        $("#txt_linkPromo").attr('disabled', 'disabled');
+        //    }
+        //});
+
+        //CRIANDO O USUÁRIO
+        $("#btn-cadastroUsuario").click(function () {
+            //alert("olá");
+            $("#btn-cadastroUsuario").html("<i class='fa fa-spinner fa-spin'></i> Loading");
+            var usuario = {
+                UsuarioId: guid(),
+                Nome: $("#txt_UNome").val(),
+                Email: $("#txt_UEmail").val(),
+                Senha: $("#txt_USenha").val(),
+                //CriadoEm: DataDeHoje(),
+                //AtualizadoEm: DataDeHoje(),
+                Status: "LEAD-CLIENTE",
+                TagAcao: "CADASTRO-CLIENTE"
+            };//$("#testform").serialize();
+            //alert(usuario.UsuarioId);
+            //$.post("/api/Usuarios", usuario);
+            $.post("/api/CriaUsuario", usuario)
+                .done(function (data) {
+                    //alert("Data Loaded: " + data);
+                    var RespUtexto = "";
+                    $("#formU").hide();
+                    if (data.responseStatus == "OK") {
+                        var RespUtexto = "<strong>Olá " + usuario.Nome + ",<br/>Um email de confirmação foi enviado para a sua caixa de correio.</strong> Por favor, clique no link que está no corpo desse email para confirmar seu cadastro. Em seguida, logue-se no formulário ao lado.";
+                    } else {
+                        RespUtexto = data.desc;
+                    }
+                    $("#RespU").html(RespUtexto);
+                    $("#btn-cadastroUsuario").html('CADASTRO');
+
+                });
+        });
+
+        //LOGIN
+        $("#btn-LOGIN").click(function () {
+            var login = { email: $("#txt_logEmail").val(), pass: $("#txt_logSenha").val() }
+            $.post("/api/login", login)
+                .done(function (data) {
+                    //alert(data.responseStatus);
+                    switch (data.responseStatus) {
+                        case "OK":
+                            
+                            $("#sectionEmpresa").show();
+                            //$("#sectionPromocao").show();
+                            //$("#txt_userid").val()
+                            $("#sectionUsuario").hide();
+                            $("#erroLogin").hide();
+                            $("#wzUsuario").removeClass("active");
+                            $("#wzEmpresa").addClass("active");
+                            
+                            break;
+                        case "NOTCONFIRMED":
+                            //alert("CADASTRO NÃO CONFIRMADO, POR FAVOR CONFIRME O SEU CADASTRO CLICANDO NO EMAIL QUE LHE ENVIAMOS.");
+                            $("#erroLogin").show();
+                            $("#erroLogin").text("CADASTRO NÃO CONFIRMADO, Por favor confirme o seu cadastro antes de fazer o login, clicando no link de confirmação no email em que lhe enviamos.");
+                            break;
+                        default:
+                            //alert("Email ou senha digitados não são válidos.");
+                            $("#erroLogin").show();
+                            $("#erroLogin").text("Email ou senha digitados não são válidos.");
+                    }
+                    
+                    
+                });
+        });
+
+        //CRIANDO A EMPRESA
+        $("#txt_cepEmpresa").focusout(function () {
+            var urlCep = "https://viacep.com.br/ws/" + $("#txt_cepEmpresa").val() + "/json/";
+            var requestcep = $.ajax({
+                url: urlCep,
+                method: "GET"
+                //data: { id: menuId },
+                //dataType: "html"
+            });
+
+            requestcep.done(function (obj) {
+                //alert(obj.logradouro);
+                $("#splogradouro").text(obj.logradouro);
+                $("#txt_logradouro").val(obj.logradouro);
+                $("#spbairro").text(obj.bairro);
+                $("#txt_bairro").val(obj.bairro);
+                $("#spcidade").text(obj.localidade);
+                $("#txt_cidade").val(obj.localidade);
+                $("#spuf").text(obj.uf);
+                $("#txt_uf").val(obj.uf);
+
+            });
+
+            requestcep.fail(function (jqXHR, textStatus) {
+                //alert("Request failed: " + textStatus);
+            });
+        });
+
+        $("#btn-cadastroEmpresa").click(function () {
+            //Get latitude e longitude
+            $("#btn-cadastroEmpresa").html("<i class='fa fa-spinner fa-spin'></i> Loading");
+            var geocoder = new google.maps.Geocoder();//new GClientGeocoder();
+            var EmpLatitude = "";
+            var EmpLongitude = "";
+            var address = $("#txt_logradouro").val() + ", " + $("#txt_numEndereco").val() + " - " + $("#txt_bairro").val() + " - " + $("#txt_cidade").val() + " - " + $("#txt_uf").val();
+
+            geocoder.geocode({ 'address': address }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    EmpLatitude = results[0].geometry.location.lat();
+                    EmpLongitude = results[0].geometry.location.lng();
+                    $("#hid_latitude").val(EmpLatitude);
+                    $("#hid_longitude").val(EmpLongitude);
+
+                    //Monta a classe Empresa
+                    var empresa = {
+                        EmpresaId: guid(),
+                        Nome: $("#txt_nomeEmpresa").val(),
+                        Telefone: $("#txt_telEmpresa").val(),
+                        Celular: $("#txt_celularEmpresa").val(),
+                        Site: $("#txt_siteEmpresa").val(),
+                        CNPJ: $("#txt_cnpjEmpresa").val(),
+                        CPFResponsavel: $("#txt_cpfEmpresa").val(),
+                        Email: $("#txt_emailEmpresa").val(),
+                        Responsavel: $("#txt_respEmpresa").val(),
+                        CEP: $("#txt_cepEmpresa").val(),
+                        Logradouro: $("#txt_logradouro").val(),
+                        Bairro: $("#txt_bairro").val(),
+                        Cidade: $("#txt_cidade").val(),
+                        UF: $("#txt_uf").val(),
+                        Numero: $("#txt_numEndereco").val(),
+                        Complemento: $("#txt_compEndereco").val(),
+                        Latitude: $("#hid_latitude").val(),
+                        Longitude: $("#hid_longitude").val(),
+                        Descricao: $("#txt_descricaoEmpresa").Editor("getText")
+                    }
+                    //alert(empresa.Latitude);
+                    $.post("/api/NovaEmpresa", empresa)
+                        .done(function (data) {
+                            if (data.responseStatus == "OK") {
+                                alert("Empresa criada com sucesso.");
+                                //location = "/site/cadastrocliente";
+                                $("#sectionEmpresa").hide();
+                                $("#sectionPromocao").show();
+                            } else {
+                                console.log(data);
+                                alert("Erro:" + data.desc);
+                            }
+                            $("#btn-cadastroEmpresa").html("CADASTRAR");
+                        })
+                        .fail(function () {
+                            var erro = "Ocorreu um Erro. Volte mais tarde, por favor.";
+                            if (empresa.Descricao.length > 1000) {
+                                erro = "O campo Descrição da Empresa não pode conter mais de 1000 caracteres.";
+                            }
+                            alert(erro);
+                            $("#btn-cadastroEmpresa").html("CADASTRAR");
+                        });
+                    
+                } else {
+                    //alert('Geocode was not successful for the following reason: ' + status);
+                    alert("Campos obrigatórios não preenchidos.");
+                    $("#btn-cadastroEmpresa").html("CADASTRAR");
+                }
+            });
+        });
+
+        $("#btn-cadastroPromocao").click(function () {
+
+            var tipodesc = $(".rad_desc:checked").val();
+            var desconto = "";
+
+            if (tipodesc == "P") {
+                desconto = $("#txtDesconto").text().replace(',', '.');
+            }
+            else {
+                desconto = $("#txt_desconto").val().replace(',', '.');
+            }
+
+            var promocao = {
+                PromocaoId: guid(),
+                Titulo: $("#txt_titAnuncio").val(),
+                Descricao: $("#txt_textAnuncio").Editor("getText"),
+                PrecoNormal: $("#txt_prcSemPromo").val().replace(',','.'),
+                PrecoComDesconto: $("#txt_prcComPromo").val().replace(',', '.'),
+                TipoDesconto: tipodesc,
+                Desconto: desconto,
+                DescDesconto: $("#txt_cupom").val(),
+                DataInicio: $("#txt_perIniPromo").val(),
+                DataFim: $("#txt_perFimPromo").val(),
+                CategoriaId: $("#sel_categoria").val(),
+                TipoAnuncio: $("#sel_tipoAnuncio").val(),
+                ModoUso: $("#txt_textModoUso").Editor("getText"),
+                CodigoPromocao: $("#txt_codPromo").val(),
+                LinkPromocao: $("#txt_linkPromo").val(),
+                MostraEndereco: $('#chk_EndShow').is(":checked"),
+                MostraTelefone: $('#chk_TelShow').is(":checked"),
+                MostraSite: $('#chk_SiteShow').is(":checked"),
+                MostraEmail: $('#chk_EmailShow').is(":checked"),
+                Ativo: true
+            };
+
+            //validacoes
+            var validaFormPromo = true;
+            //if (promocao.Titulo == null || promocao.Titulo == "") {
+            //    alert("O Título da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.Descricao == null || promocao.Descricao == "") {
+            //    alert("A Descrição da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.DataInicio == null || promocao.DataInicio == "") {
+            //    alert("A Data de Início da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.DataFim == null || promocao.DataFim == "") {
+            //    alert("A Data de Fim da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.PrecoNormal == null || promocao.PrecoNormal == "") {
+            //    alert("O preço sem desconto da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+            //if (promocao.PrecoComDesconto == null || promocao.PrecoComDesconto == "") {
+            //    alert("O preço com desconto da promoção é obrigatório.");
+            //    validaFormPromo = false;
+            //}
+
+            if ($('#chk_termo').is(":checked")) {
+                //
+            }
+            else {
+                validaFormPromo = false;
+                alert("Você precisa aceitar os termos do site.");
+            }
+            if (validaFormPromo) {
+                $.post("/api/CadastraPromocao", promocao)
+                    .done(function (data) {
+                        console.log(data);
+                        if (data.responseStatus == "OK") {
+                            alert("Promoção criada com sucesso.");
+                            location = "/site/areacliente";
+                        } else {
+                            alert(data.descConsole);
+                        }
+                    });
+            }
+
+        });
+
+        $(".rad_desc").on("click", function () {
+            var tipodesc = $(".rad_desc:checked").val();
+            //alert(tipodesc);
+            if (tipodesc == "P") {
+                $("#divDescPreco").show();
+                $("#divDescCupom").hide();
+            }
+            else {
+                $("#divDescPreco").hide();
+                $("#divDescCupom").show();
+            }
+        });
+
+    });
+</script>
+    }
 <div class="mt-2">
     
 
     <div class="mt-2">
         <a class="" href="/site/">Página Inicial</a> >>
-        <span class="">Cadastro</span>
+        <span class="">Criar Promoção</span>
     </div>
 
-    <h2 class="mt-2">Cadastro</h2>
+    <h3 class="mt-2">Criar Promoção: <span id="etapa">Etapa 1</span></h3>
     
         <div class="mt-3">
             <div class="row mt-2">
                 <div class="col-md-9">
 
-                    <div class="card">
+                    @*<div class="wizard row">
+                        <div id="wzUsuario" class="col-4 active"><span class="badge badge-default">1</span> Seu Cadastro</div>
+                        <div id="wzEmpresa" class="col-4"><span class="badge badge-default">2</span> Sua Empresa</div>
+                        <div id="wzAnuncio" class="col-4"><span class="badge badge-default">3</span> Seu Anúncio</div>
+                    </div>*@
+                    <div>
+                        <p>* Os campos com asterístico são obrigatórios.</p>
+                    </div>
+                    <div class="card" id="sectionUsuario">
                         <h4 class="card-header">
-                            Cadastro do Usuário
+                            <i class="fa fa-user-circle" aria-hidden="true"></i> Cadastro do Usuário
                         </h4>
-                        <div class="card-body p-4">
+                        <div class="card-body p-4" id="bodyUsuario">
                             <fieldset id="FdcadastroUsuario">
                                 
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Novo Cadastro</strong></p>
-                                        <input type="text" id="txt_nome" class="w-100 mb-2" placeholder="Nome" /><br />
-                                        <input type="email" id="txt_Email" class="w-100 mb-2" placeholder="Email" />
-                                        <input type="password" id="txt_senha" class="w-100 mb-2" placeholder="Senha" />
-                                        <button id="btn-cadastroUsuario" class="btn btn-primary">CADASTRO</button>
+                                        
+                                        <div id="formU">
+                                            <p><strong>Novo Cadastro</strong></p>
+                                            <input type="text" id="txt_UNome" class="w-100 mb-2" placeholder="Nome *" /><br />
+                                            <input type="email" id="txt_UEmail" class="w-100 mb-2" placeholder="Email *" />
+                                            <input type="password" id="txt_USenha" class="w-100 mb-2" placeholder="Senha *" />
+                                            <button id="btn-cadastroUsuario" class="btn btn-primary">CADASTRO</button>
+                                        </div>
+                                        <div id="RespU">
+                                        </div>
                                     </div>
                                     <div class="col-md-6 borderleft mt-1 mt-md-0">
-                                        <p><strong>Ou logue-se, caso já tenha feito cadastro:</strong></p>
+                                        <p><strong>Ou logue-se, caso já tenha confirmado o cadastro:</strong></p>
                                         <input type="email" id="txt_logEmail" class="w-100 mb-2" placeholder="Email" />
                                         <input type="password" id="txt_logSenha" class="w-100 mb-2" placeholder="Senha" />
-                                        <button id="btn-cadastroUsuario" class="btn btn-primary">LOGIN</button>
+                                        <button id="btn-LOGIN" class="btn btn-primary">LOGIN</button> <div id="erroLogin" class="text-danger"></div>
                                     </div>
                                 </div>
                             </fieldset>
@@ -43,67 +423,183 @@
                         </div>
                     </div>
 
-                    <div class="card mt-4">
+                    <div id="sectionEmpresa" class="card mt-4" style="display:none;">
+                        <h4 class="card-header">
+                            <i class="fa fa-building-o" aria-hidden="true"></i> Dados da Empresa ou Vendedor
+                        </h4>
+                        <div class="card-body p-4">
+                            <fieldset id="FdcadastroEmpresa">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        @*<label>Nome da Empresa</label>*@
+                                        <input type="text" id="txt_nomeEmpresa" max="200" class="w-100 mb-2" placeholder="Nome da Empresa ou Negócio *" />
+                                        <input type="text" id="txt_telEmpresa" class="w-100 mb-2 phone_with_ddd" placeholder="Telefone da Empresa *" />
+                                        <input type="text" id="txt_celularEmpresa" class="w-100 mb-2 phone_with_ddd" placeholder="2º telefone da empresa (caso possua)" />
+                                        <input type="email" id="txt_emailEmpresa" maxlength="100" class="w-100 mb-2" placeholder="Email da Empresa *" />
+                                        <input type="text" id="txt_siteEmpresa" maxlength="150" class="w-100 mb-2" placeholder="Site da Empresa  (caso possua)" />
+                                        <input type="text" id="txt_cnpjEmpresa" class="w-100 mb-2 cnpj" placeholder="CNPJ (caso seja empresa)" />
+                                        <input type="text" id="txt_cpfEmpresa" class="w-100 mb-2 cpf" placeholder="Digite o seu CPF *" />
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Descrição da Empresa *:</label>
+                                        <textarea rows="2" id="txt_descricaoEmpresa" class="w-100 mb-2" maxlength="1000" placeholder="Descreva o que é a sua empresa, qual seriço ou produto vende, etc..."></textarea>
+                                        @*<input type="text" id="txt_respEmpresa" class="w-100 mb-2" placeholder="Responsável pelo cadastro" />*@
+                                        <input type="text" id="txt_cepEmpresa" class="w-100 mb-2 cep" placeholder="Informe o CEP *" />
+                                        <p class="mb-1">
+                                            <span id="splogradouro">Endereço: Nenhum CEP informado ainda</span> <br />
+                                            <span id="spbairro"></span> - <span id="spcidade"></span> - <span id="spuf"></span>
+                                        </p>
+                                        <input type="hidden" id="txt_userid" />
+                                        <input type="hidden" id="txt_logradouro" />
+                                        <input type="hidden" id="txt_bairro" />
+                                        <input type="hidden" id="txt_cidade" />
+                                        <input type="hidden" id="txt_uf" />
+                                        <input type="text" id="txt_numEndereco" class="w-49 mb-2" maxlength="20" placeholder="Número *" />
+                                        <input type="text" id="txt_compEndereco" class="w-49 mb-2" maxlength="20" placeholder="Complemento" />
+                                        <input type="hidden" id="hid_latitude" />
+                                        <input type="hidden" id="hid_longitude" />
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <button id="btn-cadastroEmpresa" class="btn btn-primary">CADASTRAR</button>
+                                </div>
+                            </fieldset>
+
+                        </div>
+                    </div>
+
+                    <div class="card mt-4" id="sectionPromocao" style="display:none;">
                         <h4 class="card-header laranja f-branca">
-                            Dados da Promoção
+                            <i class="fa fa-address-card-o" aria-hidden="true"></i> Dados da Promoção
                         </h4>
                         <div class="card-body p-4">
                             <fieldset id="FdcadastroPromocao">
-                                <label>Título do Anúncio</label><br />
-                                <input type="text" id="txt_titAnuncio" class="w-100 mb-2" placeholder="" /><br />
-                                <label>Texto do Anúncio</label><br />
+                                <label>Título da Promoção *</label><br />
+                                <input type="text" id="txt_titAnuncio" class="w-100 mb-2" maxlength="120" placeholder="" /><br />
+                                <label>Descrição da Promoção *</label><br />
                                 <textarea rows="3" id="txt_textAnuncio" class="w-100 mb-2" placeholder=""></textarea>
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <label>Preço com promoção</label><br />
-                                        <input type="text" id="txt_prcComPromo" class="w-100 mb-2" placeholder="" />
+                                <div class="row mb-2">
+                                    <div class="col-md-12">
+                                        <label>Escolha o tipo de Desconto:</label><br />
+                                        <input type="radio" id="rad_desc1" name="rad_desc" class="rad_desc" value="P" checked="checked" /> Preço &nbsp; &nbsp;
+                                        <input type="radio" id="rad_desc2" name="rad_desc" class="rad_desc" value="C" /> Cupom
+                                    </div>
+                                </div>
+                                <div class="row" id="divDescPreco">
+                                    <div class="col-md-4">
+                                        <label>Preço(R$) - De:</label><br />
+                                        <input type="text" id="txt_prcSemPromo" class="w-100 mb-2 money2" placeholder="" />
+
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Preço sem promoção</label><br />
-                                        <input type="text" id="txt_prcSemPromo" class="w-100 mb-2" placeholder="" />
+                                        <label>Preço(R$) - Por:</label><br />
+                                        <input type="text" id="txt_prcComPromo" class="w-100 mb-2 money2" placeholder="" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Desconto</label><br />
+                                        <div class="f20r font-weight-bold"><span id="txtDesconto">0</span>% Off</div>
+                                    </div>
+                                </div>
+                                <div class="row mb-2" id="divDescCupom" style="display:none;">
+                                    <div class="col-md-3">
+                                        <label>Desconto:</label><br />
+                                        <input type="text" id="txt_desconto" class="w-70 mb-2 money2" placeholder="" value="" /> % Off
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label>Sobre o desconto:</label><br />
+                                        <input type="text" id="txt_cupom" class="w-100 mb-2" maxlength="49" placeholder="Ex. em toda loja, em qualquer compra, nas compras acima de R$90,00" value="" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Período da promoção *</label><br />
+                                        <input type="date" id="txt_perIniPromo" class="" /> a
+                                        <input type="date" id="txt_perFimPromo" class="" />
                                     </div>
                                     <div class="col-md-3">
-                                        <label>Desconto</label><br />
-                                        <strong class="f20r">0% Off</strong>
+                                        <label>Categoria *</label><br />
+                                        <select id="sel_categoria" class="w-100 mb-2">
+                                            <option value="1">Alimentação</option>
+                                            <option value="2">Casa e Escritório</option>
+                                            <option value="3">Educação</option>
+                                            <option value="4">Entretenimento</option>
+                                            <option value="5">Esporte</option>
+                                            <option value="6">Roupas e Acessórios</option>
+                                            <option value="7">Saúde</option>
+                                            <option value="8">Tecnologia</option>
+                                            <option value="9">Transporte</option>
+                                            <option value="10">Viagem</option>
+                                        </select>
                                     </div>
+                                    <div class="col-md-3">
+                                        <label>Tipo de Anúncio *</label><br />
+                                        <select id="sel_tipoAnuncio" class="w-100 mb-2">
+                                            <option value="Local">Local</option>
+                                            <option value="Web">Web</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="mb-2 font-weight-bold">Descreva as regras de uso da promoção *</div>
+                                    <textarea rows="3" id="txt_textModoUso" class="w-100 mb-2" placeholder=""></textarea>
+                                    @*<input type="checkbox" id="chk_nolocal" name="chk_comoCodPromo" class="ModoUso" value="nolocal" /> <strong>No Local:</strong> <span class="f9r"> O Cliente deve apresentar o Código da Promoção no ato da compra ao vendedor/atendente do estabelecimento.</span> <br/>
+            <input type="checkbox" id="chk_notelefone" name="chk_comoCodPromo" class="ModoUso" value="notelefone" /> <strong>No Telefone:</strong> <span class="f9r">O Cliente ao solicitar o produto/serviço pelo telefone, deve mencionar o Código de Promoção. </span><br/>
+            <input type="checkbox" id="chk_nosite" name="chk_comoCodPromo" class="ModoUso" value="nosite" /> <strong>No Site:</strong> <span class="f9r"> O Cliente deverá clicar no link da promoção e vir até a página de compra.</span><br />
+            <input type="checkbox" id="chk_noemail" name="chk_comoCodPromo" class="ModoUso" value="noemail" /> <strong>No Email:</strong> <span class="f9r">  O Cliente deve enviar o email com o pedido e o Código de Promoção.</span><br />*@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-5 mb-2">
-                                        <label>Período da promoção</label><br />
-                                        <input type="date" id="txt_perIniPromo" class="" /> a 
-                                        <input type="date" id="txt_perFimPromo" class="" />
+                                        <label><strong>Código da Promoção *</strong></label><br />
+                                        <input type="text" id="txt_codPromo" maxlength="15" class="w-100 mb-2" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <label>Categoria</label><br />
-                                        <select id="sel_categoria" class="w-100 mb-2">
-                                            <option value="A">Alimentação</option>
-                                            <option value="C">Casa e Escritório</option>
-                                        </select>
+                                    <div class="col-md-7" id="divlnkpromo" style="display:none;">
+                                        <label>Página ou Email da Promoção</label><br />
+                                        <input type="text" id="txt_linkPromo" maxlength="150" class="w-100 mb-2" />
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>Tipo de Anúncio</label><br />
-                                        <select id="sel_tipoAnuncio" class="w-100 mb-2">
-                                            <option value="L">Anúncio Local</option>
-                                            <option value="W">Anúncio Web</option>
-                                            <option value="W">Anúncio Local e Web</option>
-                                        </select>
-                                    </div>
+
                                 </div>
-                                <div class="">
-                                    <div class="mb-2 font-weight-bold">Como Usar o Código de Promoção:</div>
-                                    <input type="checkbox" id="chk_Cvendedor" class="mb-3" value="x" /> <strong>No Local</strong> - O Cliente deve apresentar o Código da Promoção no ato da compra ao vendedor/atendente. <br/>
-                                    <input type="checkbox" id="chk_Cemail" class="mb-3" value="x" /> <strong>No Telefone</strong> -  O Cliente ao ligar deve mencionar o Código de Promoção. <br/>
-                                    <input type="checkbox" id="chk_Cemail" class="mb-3" value="x" /> <strong>No Site</strong> - O Cliente deverá clicar no link da promoção.<br />
-                                    <input type="checkbox" id="chk_Cemail" class="mb-3" value="x" /> <strong>No Email</strong> -  O Cliente deve enviar o email com o pedido e o Código de Promoção.<br />
+                                <div class="row">
+                                    <div class="col-md-3"><input type="checkbox" id="chk_EndShow" checked /> Mostrar Endereço</div>
+                                    <div class="col-md-3"><input type="checkbox" id="chk_TelShow" checked /> Mostrar Telefone</div>
+                                    <div class="col-md-3"><input type="checkbox" id="chk_SitShow" checked /> Mostrar Site</div>
+                                    <div class="col-md-3"><input type="checkbox" id="chk_FormShow" checked /> Form. de Contato (email)</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <input type="checkbox" id="chk_termo" class="mb-3" value="" /> Aceito os <a href="/site/termos" target="_blank">Termos do Site</a>.
+                                    </div>
+                                    <div class="col-md-3 text-right">
+                                        <button id="btn-cadastroPromocao" class="btn laranja f-branca">Criar Promoção</button>
+                                        <div id="test"></div>
+                                    </div>
                                 </div>
                             </fieldset>
 
                         </div>
                     </div>
 
+                    
+
                 </div>
-                <div class="col-md-3">
-                    FAQ
+                <div class="col-md-3 mt-3 mt-md-0">
+                    <h4>Perguntas Frequentes</h4><br/>
+                    <h5 data-toggle="collapse" data-target="#resp1" aria-expanded="false" aria-controls="resp1" class="faq">É realmente gratuito para a minha empresa?</h5>
+                    @*<a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        Link with href
+                    </a>*@
+                    <p class="collapse" id="resp1">Sim, não há nenhum custo para colocar um anúncio básico no Promoção Agora. Nem cobramos nenhuma taxa ou comissão numa venda. É totalmente gratuito.</p>
+
+                    <h5 data-toggle="collapse" data-target="#resp2" aria-expanded="false" aria-controls="resp2" class="faq mt-3">Não possuo empresa, posso anunciar meu negócio?</h5>
+                    <p class="collapse" id="resp2">Sim, o anúncio de uma promoção pode ser feito por pessoa física ou jurídica. Ou seja, se você possui um pequeno negócio (ex. faz doces para vender), poderá criar uma promoção sem nenhuma restrição no site.</p>
+                    
+                    <h5 data-toggle="collapse" data-target="#resp3" aria-expanded="false" aria-controls="resp3" class="faq mt-3">Qual é o prazo máximo de veiculação da promoção anunciada?</h5>
+                    <p class="collapse" id="resp3">O prazo máximo é de 3 meses, após isso, o anunciante deve retornar ao site para extender o prazo por mais 3 meses se desejar.</p>
+                    
+                    <h5 data-toggle="collapse" data-target="#resp4" aria-expanded="false" aria-controls="resp4" class="faq mt-3">Posso ter mais de uma promoção da minha empresa?</h5>
+                    <p class="collapse" id="resp4">Sim, você pode ter até no máximo 3 anúncios veiculados ao mesmo tempo. </p>
+
                 </div>
             </div>
         </div>

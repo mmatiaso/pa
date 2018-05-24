@@ -1,0 +1,382 @@
+﻿
+@{
+    ViewBag.Title = "Promoção Agora: Área do Cliente";
+}
+<link href="~/Content/Components/EditorLineControl/editor.css" rel="stylesheet" />
+<script src="~/Content/Components/EditorLineControl/editor.js"></script>
+@section header{
+<meta name="robots" content="noindex, nofollow">
+}
+@section scripts{
+<script type="text/javascript">
+
+    if (!String.format) {
+        String.format = function (format) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            return format.replace(/{(\d+)}/g, function (match, number) {
+                return typeof args[number] != 'undefined'
+                    ? args[number]
+                    : match
+                    ;
+            });
+        };
+    }
+
+    var map = { "â": "a", "Â": "A", "à": "a", "À": "A", "á": "a", "Á": "A", "ã": "a", "Ã": "A", "ê": "e", "Ê": "E", "è": "e", "È": "E", "é": "e", "É": "E", "î": "i", "Î": "I", "ì": "i", "Ì": "I", "í": "i", "Í": "I", "õ": "o", "Õ": "O", "ô": "o", "Ô": "O", "ò": "o", "Ò": "O", "ó": "o", "Ó": "O", "ü": "u", "Ü": "U", "û": "u", "Û": "U", "ú": "u", "Ú": "U", "ù": "u", "Ù": "U", "ç": "c", "Ç": "C", " ": "-", "%": "porcento", ",": "", "&": "e" };
+
+
+    function removerAcentos(s) { return s.replace(/[\W\[\] ]/g, function (a) { return map[a] || a }) };
+    
+    
+    function callLista(_id) {
+            var urlservice = String.format("/api/ListaPromoByUsuario?uid={0}", _id);
+            //alert(lat + ' ' + lgt);
+            var jqxhr = $.ajax({
+                url: urlservice,
+                beforeSend: function () {
+                    $("#promosUser").text("loading...");
+                }
+            })
+
+                .done(function (data) {
+                    //console.log(data);
+                    //alert(data.PromoCards[0].Distancia);
+                    var pms = "";
+                    var td = "";
+                    
+                    var ExpiraEm = "Expirou em ";
+                    var btnExpira = "btn-basic";
+                   
+                    for (i = 0; i < data.PromoCards.length; i++) {
+
+                        pms += "<div class='font-weight-bold mt-3'>Promoção " + (i + 1);
+                        pms += ": <button type='button' class='btn btn-primary btn-sm editar' data-promo='" + data.PromoCards[i].PromoId + "'> Editar </button> ";
+                        if (data.PromoCards[i].Ativo) {
+                            ExpiraEm = "Válido até " + data.PromoCards[i].DataFim;
+                            btnExpira = "btn-success";
+                            pms += " <button type='button' class='btn btn-warning btn-sm ativar' data-promo='" + data.PromoCards[i].PromoId + "'> Desativar </button> ";
+                        } else {
+                            ExpiraEm = "Expirou em " + data.PromoCards[i].DataFim;
+                            btnExpira = "btn-basic";
+                            pms += " <button type='button' class='btn btn-success btn-sm ativar' data-promo='" + data.PromoCards[i].PromoId + "'> Ativar </button> ";
+                        }
+                        pms += " <a href='#' class='btn btn-danger btn-sm excluir' data-promo='" + data.PromoCards[i].PromoId + "'> Excluir </a></div>";
+
+                        pms += "<div class='reg mt-3'><div class='row'>";
+                        
+                        pms += "<div class='col-12'><div class='row'><div class='col-md-9'>";
+                        if (data.PromoCards[i].TipoAnuncio == 'Web') {
+                            pms += "<div class='f-verde f8r'><span class='font-weight-bold'>Oferta Web</span></div>";
+                            //pms += String.format("<div class='f-verde f9r'><span class='font-weight-bold'>{0}</span> - <span class='f-verde f8r'>{1}</span></div>", data.PromoCards[i].EmpresaNome, data.PromoCards[i].Site);
+                        } else {
+                            pms += String.format("<div class='f-verde f8r'><span class='font-weight-bold'>{0} Km</span> - {1} </div>", formataDec2(data.PromoCards[i].Distancia), data.PromoCards[i].Bairro);
+                        }
+                        var plink = removerAcentos(data.PromoCards[i].Titulo);
+                        pms += String.format("<span class='f11r subtitulo'><a href='/p/{3}/{2}'>{0} - {1} Off</a></span><br />", data.PromoCards[i].Titulo, formataPorcentagem(data.PromoCards[i].Desconto), data.PromoCards[i].PromoId, plink);
+                        pms += String.format("<span class='f-verde f9r font-weight-bold'>{0}</span><br />", data.PromoCards[i].EmpresaNome);
+                        if (data.PromoCards[i].TipoAnuncio == 'Web') {
+                            pms += String.format("<div class='f-verde f8r'><i class='fa fa-map-marker'></i> {0}</div>", data.PromoCards[i].Site);
+                        } else {
+                            pms += String.format("<div class='f-verde f8r hidden-md-down'><i class='fa fa-map-marker'></i> {0}</div>", data.PromoCards[i].Endereco);
+                        }
+                        td = data.PromoCards[i].TipoDesconto.trim();
+                        //alert(td);
+                        if (td == "P") {
+                            pms += String.format("<div>Preço: <span class='f14r f-verde font-weight-bold'>{0}</span> <span id='aPrecoNormal' class='rabiscado f8r'>({1})</span></div></div>", formataDinheiro(data.PromoCards[i].PrecoComDesconto), formataDinheiro(data.PromoCards[i].PrecoNormal));
+                        } else if (td == "C") {
+                            pms += String.format("<div>Desc.: <span class='f14r f-verde font-weight-bold'>{0}</span> <span id='descdesc' class='f-verde f8r'> ({1})</span></div></div>", formataPorcentagem(data.PromoCards[i].Desconto), data.PromoCards[i].DescDesconto);
+                        }
+                        //alert(data.PromoCards[i].DataFim);
+                        
+                        //alert(dtfim);
+                        //alert(hj + "| " + dtfim);
+                        
+                        pms += String.format("<div class='col-md-3 text-right'><button class='btn btn-sm " + btnExpira + " f-branca'>{0}</button></div></div></div></div></div>", ExpiraEm);
+                    }
+
+                    $("#promosUser").html(pms);
+
+                    //pagination
+                    //alert(pag);
+                    if (data.Paginas > 1) {
+                        var pagin = "";
+                        if (pag > 1) {
+                            pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\");'>Anterior</a></li>", pag - 1, latitude, longitude, tipoAnuncio);
+                        }
+                        else {
+                            pagin += "<li class='page-item disabled'><a class='page-link' href='#'>Anterior</a></li>";
+                        }
+                        for (j = 1; j <= data.Paginas; j++) {
+                            if (j == pag) {
+                                pagin += String.format("<li class='page-item active'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\");'>{0}</a></li>", j, latitude, longitude, tipoAnuncio.toString());
+                            } else {
+                                pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\");'>{0}</a></li>", j, latitude, longitude, tipoAnuncio.toString());
+                                //pagin += "<li class='page-item'><a class='page-link' href='javascript:callLista(" + j + ", " + latitude + ", " + longitude + ", " + tipoAnuncio + "); '>" + j + "</a></li>";
+                            }
+                        }
+                        if (pag == data.Paginas) {
+                            pagin += "<li class='page-item disabled'><a class='page-link' href='#'>Próximo</a></li>";
+                        }
+                        else {
+                            pagin += String.format("<li class='page-item'><a class='page-link' href='javascript:callLista({0}, {1}, {2}, \"{3}\");'>Próximo</a></li>", pag + 1, latitude, longitude, tipoAnuncio);
+                        }
+
+                        $(".pagination").html(pagin);
+                    }
+                })
+                .fail(function () {
+                    alert(errorThrown + textStatus);
+                })
+                .always(function () {
+                    //alert("complete");
+                    $(document).scrollTop($("#inicio").offset().top);
+                });
+    }
+
+    function GetEmpresa(_id) {
+        $.get("/api/Empresas?id=" + _id)
+            .done(function (data) {
+                $("#EmpNome").text(data.Nome);
+                $("#EmpEmail").text(data.Email);
+                $("#EmpTelefone").text(data.Telefone);
+                $(".editEmpresa").attr("data-promo", data.EmpresaId);
+            });
+    }
+
+    function GetUsuario() {
+        $.get("/api/Usuarios?id=" + getCookie("uid"))
+            .done(function (data) {
+                $("#UsuNome").text(data.Nome);
+                $("#UsuEmail").text(data.Email);
+            });
+    }
+
+    callLista(getCookie("uid"));
+    GetUsuario();
+
+    if (getCookie("eid") != null && getCookie("eid") != "") {
+        GetEmpresa(getCookie("eid"));
+    }
+    else {
+        $("#Empcard").hide();
+    }
+    
+    
+
+    
+    $(document).ready(function () {
+
+        //check cookie
+        var logged = getCookie("logged");
+        if (logged) {
+            $("#cliNome").text(getCookie("loggedName"));
+        }
+        else {
+            location = "/site/login";
+        }
+
+        
+
+        //list promocoes
+        
+
+
+        
+
+        $('body').on('click', '.editar', function () {
+            var pid = $(this).attr("data-promo");
+            $('#myModal').modal('show');
+            $(".modal-title").text("Edite sua Promoção");
+            $(".modal-body").html("loading...");
+            var urlload = "/site/EditaPromocao?pid=" + pid;
+            $(".modal-body").load(urlload);
+        });
+
+        $('body').on('click', '.criar', function () {
+            //var pid = $(this).attr("data-promo");
+            if (getCookie("eid") != "") {
+                $('#myModal').modal('show');
+                var urlload = "/site/CadastroPromocao?uid=" + getCookie("uid");
+                $(".modal-body").load(urlload);
+            }
+            else {
+                location = "/site/cadastrocliente";
+            }
+        });
+
+        $('body').on('click', '.excluir', function () {
+            var pid = $(this).attr("data-promo");
+            var confirmExcusao = confirm("Você tem certeza que deseja excluir essa promoção? Depois de apagada, ela não poderá mais ser recuperada.");
+            if (confirmExcusao) {
+                $.post("/api/ApagaPromocao?id=" + pid)
+                    .done(function (data) {
+                        if (data.responseStatus == "OK") {
+                            alert("Promoção excluída com sucesso.");
+                            location = "/site/areacliente";
+                        } else {
+                            alert(data.desc);
+                        }
+                    });
+            }
+        });
+
+        $('body').on('click', '.ativar', function () {
+            var pid = $(this).attr("data-promo");
+            var confirmA = confirm("Você tem certeza que deseja ativar ou desativar essa promoção? A ativação aumentará o periodo de publicação por uma semana. Recomendado editar a promoção para detalhar melhor o prazo de veiculação.");
+            if (confirmA) {
+                $.post("/api/AtivaPromocao?id=" + pid)
+                    .done(function (data) {
+                        if (data.responseStatus == "OK") {
+                            alert("Promoção ativada com sucesso.");
+                            location = "/site/areacliente";
+                        } else {
+                            alert(data.desc);
+                        }
+                    });
+            }
+        });
+        
+        $('body').on('click', '.editEmpresa', function () {
+            var eid = $(this).attr("data-promo");
+            $(".modal-body").html("loading...");
+            $(".modal-title").text("Edite sua Empresa");
+            var urlload = "/site/EditaEmpresa?eid=" + eid;
+            $(".modal-body").load(urlload);
+            $('#myModal').modal('show');
+        });
+
+        $('body').on('click', '.editUsuario', function () {
+            //var eid = $(this).attr("data-promo");
+            $(".modal-body").html("loading...");
+            $(".modal-title").text("Edite Seus Dados");
+            var urlload = "/site/EditaUsuario";
+            $(".modal-body").load(urlload);
+            $('#myModal').modal('show');
+        });
+        
+
+        //$(".excluir").click(function () {
+        //    alert("oi");
+        //    $('#myModal').modal('show');
+        //    //$('.modal-body').text("ola testando");
+        //    $(".modal-body").load("/cadastropromocao.html");
+        //})
+    })
+
+    //$('#myModal').on('shown.bs.modal', function () {
+    //    modal.find('.modal-title').text('New message to ');
+    //})
+
+
+</script>
+    }
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header laranja f-branca">
+                <h5 class="modal-title" id="exampleModalLabel">Dados da Promoção</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            @*<div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="mt-2">
+
+
+    <div class="mt-2">
+        <a class="" href="/site/">Página Inicial</a> <i class="fa fa-angle-double-right"></i>
+        <strong>Área do Cliente</strong>
+    </div>
+
+    @*<h2 class="mt-2">Área do Cliente</h2>*@
+    <h4 class="mt-3">Olá <span id="cliNome">Mauricio</span>,</h4>
+    <p>Essa é a área onde você pode fazer a gestão das suas promoções e atualizar seus dados.</p>
+    <div class="mt-3">
+        <div class="row mt-2">
+            <div class="col-md-9">
+                <div class="row mt-2">
+                    <div class="col-6 f12r font-weight-bold">Promoções Publicadas</div>
+                    <div class="col-6 text-right"><button id="btn_AddPromocao" class="btn btn-primary f-branca criar">Nova Promoção</button></div>
+                </div>
+                    <hr />
+                    @*<div class="font-weight-bold">Promoção 1: 
+                        <a href="#" class="editar">Editar</a> | 
+                    <a href="#" class="editar" >Excluir</a></div>
+                <button type='button' class='excluir' data-promo="hjh-kh-9090">Editar</button>
+                <div class="reg mt-3">
+                    <div class="row">
+                    <div class="col- auto">
+                        <img class="imgw40" src="/Content/img/alimentacao.jpg" alt="">
+                        </div>
+                    <div class="col-10">
+                        <div class="row">
+                        <div class="col-md-10">
+                            <div class="f-verde f8r">
+                            <span class="font-weight-bold">7,39 Km</span> - Barra da Tijuca</div>
+                            <span class="f12r subtitulo"><a href="/site/promocao?pid=5283d2b9-a870-724d-757c-806e6bf44baa">Rodízio de Carnes com Buffet Liberado. Mais de 20 tipos de carne - 43,33% Off</a></span>
+                            <br><span class="f-verde f9r font-weight-bold">Restaurante Argus</span>
+                            <br><div>Preço: <span class="f14r f-verde font-weight-bold">R$ 34,00</span></div></div><div class="col-md-2 text-right"><button class="btn btn-sm btn-danger f-branca">Válido até 16/01/2018</button></div></div></div></div>
+                </div>*@
+
+                <div id="promosUser"></div>
+                <div id="paginacao" class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+                    </ul>
+                </div>
+
+
+
+
+                </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <h4 class="card-header">
+                        Seus Dados
+                    </h4>
+                    <div class="card-body p-2">
+                        <span>Nome:</span><br/>
+                        <span class="font-weight-bold" id="UsuNome"></span><br />
+                        <span>Email:</span><br />
+                        <span class="font-weight-bold" id="UsuEmail"></span><br /><br />
+                        @*<span class="font-weight-bold">...</span><br />*@
+                        <button id="btn_editUsuario" class="btn btn-primary btn-sm f-branca editUsuario">Editar Dados</button>
+
+                    </div>
+                </div>
+                <p></p>
+                <div class="card" id="Empcard">
+                    <h4 class="card-header" id="EmpNome">
+                        Empresa B
+                    </h4>
+                    <div class="card-body p-2">
+                       
+                        <span>Email:</span><br />
+                        <span class="font-weight-bold" id="EmpEmail"></span><br />
+                        <span>Telefone:</span><br />
+                        <span class="font-weight-bold" id="EmpTelefone"></span><br /><br />
+                        @*<span class="font-weight-bold">...</span><br />*@
+                        <button id="btn_editEmpresa" class="btn btn-primary btn-sm f-branca editEmpresa" data-promo="">Editar Empresa</button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+

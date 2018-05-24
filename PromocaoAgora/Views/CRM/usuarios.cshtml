@@ -1,0 +1,75 @@
+﻿@model IEnumerable<PromocaoAgora.Models.Usuario>
+
+@{
+    ViewBag.Title = "Usuarios";
+}
+@section header{
+    <meta name="robots" content="noindex, nofollow">
+}
+
+<h2>Usuarios</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Nome)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        @*<th>
+                @Html.DisplayNameFor(model => model.Senha)
+            </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Ativo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TagAcao)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CriadoEm)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AtualizadoEm)
+        </th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nome)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            @*<td>
+                    @Html.DisplayFor(modelItem => item.Senha)
+                </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ativo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TagAcao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CriadoEm)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AtualizadoEm)
+            </td>
+
+        </tr>
+    }
+
+</table>

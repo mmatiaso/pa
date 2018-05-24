@@ -1,0 +1,126 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@section Scripts{
+@*<script src="~/Scripts/site.js"></script>*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //allUsuarios
+            $.get("/api/CountUsuarios")
+                .done(function (data) {
+                    $("#allUsuarios").text(data);
+                });
+
+            //ativosUsuarios
+            $.get("/api/CountUsuarios?_ativo=true")
+                .done(function (data) {
+                    $("#ativosUsuarios").text(data);
+                });
+
+            //allEmpresas
+            $.get("/api/CountEmpresas")
+                .done(function (data) {
+                    $("#allEmpresas").text(data);
+                });
+
+            //ativosPromocoes
+            $.get("/api/CountPromocoes?_ativo=true")
+                .done(function (data) {
+                    $("#ativosPromocoes").text(data);
+                });
+
+            //ultPromocoes
+            $.get("/api/Promocaos?_take=5&_ativo=true")
+                .done(function (data) {
+                    console.log(data);
+                    var rhtml = "<table class='table'>";
+                    rhtml += "<tr><th>Promoção</th><th>Data</th></tr>";
+                    for (i = 0; i < data.length; i++) {
+                        var d = new Date(data[i].CriadoEm);
+                        rhtml += "<tr><td>" + data[i].Titulo + "</td><td>" + FormataData(d) + "</td></tr>";
+                    }
+                    rhtml += "</table>";
+
+                    $("#ultPromocoes").html(rhtml);
+                });
+
+            //ultUsuarios
+            $.get("/api/Usuarios?_take=5")
+                .done(function (data) {
+                    console.log(data);
+                    var rhtml = "<table class='table'>";
+                    rhtml += "<tr><th>Email</th><th>Data</th></tr>";
+                    for (i = 0; i < data.length; i++) {
+                        var d = new Date(data[i].CriadoEm);
+                        rhtml += "<tr><td>" + data[i].Email + "</td><td>" + FormataData(d) + "</td></tr>";
+                    }
+                    rhtml += "</table>";
+
+                    $("#ultUsuarios").html(rhtml);
+                });
+        });
+    </script>
+}
+@section header{
+    <meta name="robots" content="noindex, nofollow">
+}
+<div class="mt-2">
+    <a class="" href="/site/">Página Inicial</a> <i class="fa fa-angle-double-right"></i>
+    <strong>CRM</strong>
+</div>
+<h2 class="my-2">CRM</h2>
+<div class="my-2">
+    
+    <strong>Menu</strong> | <a href="/crm/usuarios">Usuarios</a> | <a href="/crm/mailing">Mailing</a> | <a href="/crm/campaign">Campanhas</a>
+</div>
+<div class="row my-2">
+    <div class="col-md-3 text-center">
+        <div class="box2 ml-1">
+            <h5 class="card-title" id="ativosPromocoes">00</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Promoções Ativas</h6>
+        </div>
+    </div>
+
+    <div class="col-md-3 text-center">
+        <div class="box2 ml-1">
+            <h5 class="card-title" id="ativosUsuarios">00</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Usuários Ativos</h6>
+        </div>
+    </div>
+
+    <div class="col-md-3 text-center">
+        <div class="box2 ml-1">
+            <h5 class="card-title" id="allUsuarios">00</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Usuários</h6>
+        </div>
+    </div>
+
+    <div class="col-md-3 text-center">
+        <div class="box2">
+            <h5 class="card-title" id="allEmpresas">00</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Empresas</h6>
+        </div>
+    </div>
+
+
+</div>
+<div class="row my-2">
+    <div class="col-md-6">
+        <div class="box2">
+            <h5 class="card-title">Últimas Promoções</h5>
+            <div id="ultPromocoes">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box2">
+            <h5 class="card-title">Últimos Usuários</h5>
+            <div id="ultUsuarios">
+
+            </div>
+        </div>
+    </div>
+</div>
+
